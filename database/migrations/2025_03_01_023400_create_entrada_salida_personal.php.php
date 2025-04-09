@@ -17,11 +17,17 @@ class CreateEntradaSalidaPersonal extends Migration
             $table->id();
             
             $table->timestamp('fecha_hora_ingreso');
-            $table->timestamp('fecha_hora_salida');
-            $table->enum('visito_ultimas_48h', ['Sí', 'No'])->default('No');  // Usando 'Sí' y 'No'
+            $table->timestamp('fecha_hora_salida')->nullable();
+            $table->boolean('visito_ultimas_48h')->default(0); // 1 para "Sí", 0 para "No"
             $table->foreignId('nombre')
-            ->constrained('register_personal')
-            ->onDelete('cascade');
+                ->constrained('register_personal')
+                ->onDelete('cascade');
+            $table->foreignId('grupo')
+                ->constrained('grupos_personal')
+                ->onDelete('cascade');
+            $table->foreignId('ficha')
+                ->constrained('fichas')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }

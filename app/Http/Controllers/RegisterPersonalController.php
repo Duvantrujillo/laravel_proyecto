@@ -1,118 +1,104 @@
 <?php
-
 namespace App\Http\Controllers;
-use Illuminate\Database\QueryException;
 
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 use App\Models\grupos_personal;
+use App\Models\Ficha;
 use App\Models\register_personal;
 use Illuminate\Http\Request;
 
 class RegisterPersonalController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
+    public function index(){
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         $grupos = grupos_personal::all();
-    
         return view('auth.user.r-personal.r-personal', compact('grupos'));
     }
-    
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
 
     public function store(Request $request)
     {
-        // Validación
         $request->validate([
-            'nombre' => 'required', 
+            'nombre' => 'required',
             'numero_documento' => 'required|numeric|unique:register_personal,numero_documento',
             'numero_telefono' => 'required|digits:10',
             'correo' => 'required|email',
             'grupo' => 'required|exists:grupos_personal,id',
-        ],[
-            'numero_documento.unique' => 'El número de documento ya está registrado.' // Mensaje personalizado
+            'fichas' => 'required|exists:fichas,id',
+        ], [
+            'numero_documento.unique' => 'El número de documento ya está registrado.'
         ]);
-    
+
         try {
-            // Intentar crear el registro
-            register_personal::create($request->all());
-    
-            // Redirigir con mensaje de éxito
-            return redirect()->route('register.create')->with('success', 'Recolección registrada con éxito.');
-            
+            register_personal::create([
+                'nombre' => ucwords(strtolower($request->nombre)),
+                'numero_documento' => $request->numero_documento,
+                'numero_telefono' => $request->numero_telefono,
+                'correo' => $request->correo,
+                'grupo' => $request->grupo,
+                'fichas' => $request->fichas,
+            ]);
+
+            return redirect()->route('register.create')->with('success', 'Aprendiz registrado con éxito.');
         } catch (QueryException $e) {
-            // Manejar el error de duplicado de manera personalizada
-            if ($e->getCode() == 23000) {
-                return redirect()->back()->withErrors(['error' => 'El número de documento ya está registrado.']);
-            }
-    
-            // Manejar otros errores
             return redirect()->back()->withErrors(['error' => 'Hubo un error al registrar los datos.']);
         }
     }
-    
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\register_personal  $register_personal
-     * @return \Illuminate\Http\Response
-     */
-    public function show(register_personal $register_personal)
+    public function getFichas(Request $request)
     {
-        //
+        $grupoId = $request->grupo_id;
+        $fichas = Ficha::where('grupo_id', $grupoId)->get();
+        return response()->json($fichas);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\register_personal  $register_personal
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(register_personal $register_personal)
+    public function checkNumeroDocumento(Request $request)
     {
-        //
+        $exists = register_personal::where('numero_documento', $request->numero_documento)->exists();
+        return response()->json(['exists' => $exists]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\register_personal  $register_personal
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, register_personal $register_personal)
+    public function indexGruposFichas()
     {
-        //
+        $grupos = grupos_personal::all();
+        $fichasPorGrupo = Ficha::with('grupo')
+            ->get()
+            ->groupBy('grupo_id')
+            ->map(function ($fichas) {
+                return [
+                    'grupo_nombre' => $fichas->first()->grupo->nombre ?? 'Sin grupo asignado',
+                    'numeros' => $fichas->pluck('nombre')->all()
+                ];
+            });
+
+        return view('auth.user.r-personal.r-grupo.grupos-fichas', compact('grupos', 'fichasPorGrupo'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\register_personal  $register_personal
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(register_personal $register_personal)
+    public function filtrarPersonal(Request $request)
     {
-        //
+        $grupos = grupos_personal::all();
+        $fichas = null;
+        $personal = register_personal::query();
+
+        if ($request->filled('grupo_id')) {
+            $personal->whereHas('grupo', function ($query) use ($request) {
+                $query->where('id', $request->grupo_id);
+            });
+            $fichas = Ficha::where('grupo_id', $request->grupo_id)->get();
+        }
+
+        if ($request->filled('ficha_id')) {
+            $personal->where('fichas', $request->ficha_id);
+        }
+
+        $personal = $personal->with(['grupo', 'ficha'])->paginate(10);
+
+        // Depuración opcional: Solo si necesitas inspeccionar los datos
+        // Log::info('Personal encontrado:', ['data' => $personal->items()]);
+
+        return view('auth.user.r-personal.personal-filtrado', compact('grupos', 'fichas', 'personal'));
     }
 }

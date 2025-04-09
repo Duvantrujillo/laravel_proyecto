@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGruposPersonal extends Migration
+class CreateObservationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class CreateGruposPersonal extends Migration
      */
     public function up()
     {
-        Schema::create('grupos_personal', function (Blueprint $table) {
+        Schema::create('observations', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre')->unique();
+            $table->integer('amount');
+            $table->string('product');
+            $table->text('observation');
             $table->timestamps();
         });
     }
@@ -27,6 +29,6 @@ class CreateGruposPersonal extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('grupos_personal');
+        Schema::dropIfExists('observations');
     }
 }

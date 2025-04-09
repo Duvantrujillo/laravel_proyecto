@@ -6,127 +6,185 @@ use App\Models\entrada_salida_personal;
 use Illuminate\Http\Request;
 use App\Models\grupos_personal;
 use App\Models\register_personal;
+use App\Models\Ficha;
 
 class EntradaSalidaPersonalController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         $grupos = grupos_personal::all();
-
         return view('auth.user.r-personal.r-entrada-salida.r-entrada-salida', compact('grupos'));
     }
-    public function getUsuariosPorGrupo(Request $request)
+
+    public function getFichasPorGrupo(Request $request)
     {
-        // Validar que el grupo esté presente y exista
         $request->validate([
-            'grupo' => 'required|exists:grupos_personal,id', // Usamos 'grupo' como clave foránea
+            'grupo' => 'required|exists:grupos_personal,id',
         ]);
 
-        // Obtener el grupo seleccionado
-        $grupo = $request->grupo;
+        $fichas = Ficha::where('grupo_id', $request->grupo)->get();
+        return response()->json($fichas);
+    }
 
-        // Filtrar los usuarios por el grupo seleccionado
-        $usuarios = register_personal::where('grupo', $grupo)->get(); // Filtrar por 'grupo'
+    public function getUsuariosPorFicha(Request $request)
+    {
+        $request->validate([
+            'ficha' => 'required|exists:fichas,id',
+        ]);
 
-        // Devolver los usuarios en formato JSON
+        $usuarios = register_personal::where('fichas', $request->ficha)->get();
         return response()->json($usuarios);
     }
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store(Request $request)
-{
-    // Validación
-    $request->validate([
-        'grupo' => 'required|exists:grupos_personal,id', // Validar que el grupo existe
-        'usuario' => 'required|exists:register_personal,id', // Validar que el usuario existe
-        'entrada' => 'required|date', // Validar la fecha y hora de entrada
-        'salida' => 'required|date|after_or_equal:entrada', // La salida debe ser después o igual a la entrada
-        'visitó_granja' => 'required|boolean', // Validar si visitó la granja
-    ]);
-
-    // Crear el registro de entrada/salida
-    try {
-        // Crear una nueva entrada/salida
-        $entradaSalida = new entrada_salida_personal();
-        $entradaSalida->fecha_hora_ingreso = $request->entrada;
-        $entradaSalida->fecha_hora_salida = $request->salida;
-        $entradaSalida->visito_ultimas_48h = $request->visitó_granja;
-        $entradaSalida->nombre = $request->usuario; // Aquí el campo 'nombre' se refiere al ID del usuario
-
-        // Guardar el registro
-        $entradaSalida->save();
-
-        // Redirigir con mensaje de éxito
-        return redirect()->route('entrada_salida.create')->with('success', 'Registro de entrada/salida guardado correctamente.');
-    } catch (\Exception $e) {
-        // En caso de error, redirigir con mensaje de error
-        return redirect()->back()->withErrors(['error' => 'Hubo un error al guardar el registro.']);
-    }
-}
-
-
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\entrada_salida_personal  $entrada_salida_personal
-     * @return \Illuminate\Http\Response
-     */
-    public function show(entrada_salida_personal $entrada_salida_personal)
     {
-        //
+        $request->validate([
+            'grupo' => 'required|exists:grupos_personal,id',
+            'ficha' => 'required|exists:fichas,id',
+            'usuarios' => 'required|array',
+            'usuarios.*.selected' => 'nullable|boolean',
+            'usuarios.*.entrada' => 'required_if:usuarios.*.selected,1|date',
+            'usuarios.*.visito_granja' => 'required_if:usuarios.*.selected,1|boolean',
+        ]);
+
+        try {
+            $usuarios = $request->input('usuarios', []);
+            foreach ($usuarios as $usuarioId => $data) {
+                if (isset($data['selected']) && $data['selected']) {
+                    entrada_salida_personal::create([
+                        'fecha_hora_ingreso' => $data['entrada'],
+                        'fecha_hora_salida' => null, // Dejamos null ya que no se envía desde esta vista
+                        'visito_ultimas_48h' => $data['visito_granja'],
+                        'nombre' => $usuarioId, // Asumimos que 'nombre' es el ID del usuario en tu modelo
+                        'grupo' => $request->grupo,
+                        'ficha' => $request->ficha,
+                    ]);
+                }
+            }
+
+            return redirect()->route('entrada_salida.create')->with('success', 'Registros de entrada/salida guardados correctamente.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Hubo un error al guardar los registros: ' . $e->getMessage()]);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\entrada_salida_personal  $entrada_salida_personal
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(entrada_salida_personal $entrada_salida_personal)
+   
+    // ... Otros métodos sin cambios ...
+
+    // ... Otros métodos sin cambios ...
+
+    public function index(Request $request)
     {
-        //
+        $filtros = $request->only(['id', 'fecha_hora_ingreso', 'fecha_hora_salida', 'visito_ultimas_48h', 'nombre', 'grupo', 'ficha']);
+    
+        $query = entrada_salida_personal::with(['nombreRelacion', 'grupoRelacion', 'fichaRelacion']);
+    
+        foreach ($filtros as $campo => $valor) {
+            if ($valor !== null && $valor !== '') {
+                if ($campo === 'fecha_hora_ingreso' || $campo === 'fecha_hora_salida') {
+                    $query->whereDate($campo, $valor);
+                } elseif ($campo === 'visito_ultimas_48h') {
+                    $query->where($campo, $valor);
+                } elseif ($campo === 'grupo') {
+                    $query->where('grupo', $valor); // Filtra por ID de grupo
+                } elseif ($campo === 'ficha') {
+                    $query->where('ficha', $valor); // Filtra por ID de ficha
+                } elseif ($campo === 'nombre') {
+                    // Filtrar por el nombre en la relación register_personal
+                    $query->whereHas('nombreRelacion', function ($q) use ($valor) {
+                        $q->where('nombre', 'like', "%$valor%");
+                    });
+                } else {
+                    $query->where($campo, 'like', "%$valor%");
+                }
+            }
+        }
+    
+        $query->whereNull('fecha_hora_salida');
+    
+        $registros = $query->get();
+        $grupos = grupos_personal::all();
+        $fichas = Ficha::all();
+    
+        return view('auth.user.r-personal.r-entrada-salida.salida', [
+            'registros' => $registros,
+            'filtros' => $filtros,
+            'grupos' => $grupos,
+            'fichas' => $fichas,
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\entrada_salida_personal  $entrada_salida_personal
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, entrada_salida_personal $entrada_salida_personal)
+    // ... Otros métodos sin cambios ...
+
+
+    // ... Otros métodos sin cambios ...
+
+    
+    public function actualizarFechaSalida(Request $request)
     {
-        //
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:entrada_salida_personal,id',
+            'fecha_salida' => 'required|date', // Acepta formato datetime
+        ]);
+    
+        entrada_salida_personal::whereIn('id', $request->ids)
+            ->update(['fecha_hora_salida' => $request->fecha_salida]);
+    
+        return redirect()->route('entrada_salida.index')->with('success', 'Fecha y hora de salida actualizadas correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\entrada_salida_personal  $entrada_salida_personal
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(entrada_salida_personal $entrada_salida_personal)
-    {
-        //
-    }
+
+
+  
+    
+  
+        // ... Otros métodos existentes ...
+    
+        public function filtrarPorGrupo(Request $request)
+        {
+            $grupos = grupos_personal::all();
+            $fichas = Ficha::all();
+    
+            $registros = entrada_salida_personal::query()
+                ->with(['nombreRelacion', 'grupoRelacion', 'fichaRelacion']);
+    
+            // Filtro por grupo
+            if ($request->filled('grupo_id')) {
+                $registros->where('grupo', $request->grupo_id);
+            }
+    
+            // Filtro por ficha
+            if ($request->filled('ficha_id')) {
+                $registros->where('ficha', $request->ficha_id);
+            }
+    
+            // Filtro por fecha/hora de ingreso
+            if ($request->filled('fecha_hora_ingreso')) {
+                $registros->where('fecha_hora_ingreso', '>=', $request->fecha_hora_ingreso);
+            }
+    
+            // Filtro por fecha/hora de salida
+            if ($request->filled('fecha_hora_salida')) {
+                $registros->where('fecha_hora_salida', '>=', $request->fecha_hora_salida);
+            }
+    
+            // Filtro por visitó granja
+            if ($request->filled('visito_ultimas_48h')) {
+                $registros->where('visito_ultimas_48h', $request->visito_ultimas_48h);
+            }
+    
+            // Filtro por nombre de persona
+            if ($request->filled('nombre')) {
+                $registros->whereHas('nombreRelacion', function ($query) use ($request) {
+                    $query->where('nombre', 'like', '%' . $request->nombre . '%');
+                });
+            }
+    
+            $registros = $registros->orderBy('fecha_hora_ingreso', 'desc')->paginate(10);
+    
+            return view('auth.user.r-personal.r-entrada-salida.entradas-salidas-filtradas', compact('grupos', 'fichas', 'registros'));
+        }
+    
+
 }

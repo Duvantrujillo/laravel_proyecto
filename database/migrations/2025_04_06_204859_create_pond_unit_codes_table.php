@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGruposPersonal extends Migration
+class CreatePondUnitCodesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class CreateGruposPersonal extends Migration
      */
     public function up()
     {
-        Schema::create('grupos_personal', function (Blueprint $table) {
+        Schema::create('pond_unit_codes', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre')->unique();
+            $table->foreignId('pond_id')->constrained('GeoPonds')->onDelete('cascade');
+            $table->integer('identificador');
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ class CreateGruposPersonal extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('grupos_personal');
+        Schema::dropIfExists('pond_unit_codes');
     }
 }

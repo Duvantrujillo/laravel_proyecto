@@ -21,8 +21,12 @@ class CreateRegisterPersonal extends Migration
             $table->string('correo');
             $table->timestamps();
             $table->foreignId('grupo')
-                  ->constrained('grupos_personal')
+            ->constrained('grupos_personal')
+            ->onDelete('cascade');
+            $table->foreignId('fichas')
+                  ->constrained('fichas')
                   ->onDelete('cascade');
+           
         });
     }
 
