@@ -20,7 +20,12 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
 <body>
-   
+    <script>
+        window.addEventListener('beforeunload', function () {
+            navigator.sendBeacon('/logout');
+        });
+    </script>
+    
 
         <main class="py-4">
             @yield('content')

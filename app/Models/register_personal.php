@@ -12,7 +12,7 @@ class register_personal extends Model
 
     public function grupo()
     {
-        return $this->belongsTo(grupos_personal::class, 'grupo',);
+        return $this->belongsTo(grupos_personal::class, 'grupo','id');
     }
 
     public function ficha()

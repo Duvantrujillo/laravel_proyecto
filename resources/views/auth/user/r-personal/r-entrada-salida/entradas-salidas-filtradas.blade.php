@@ -199,5 +199,30 @@
     $(document).ready(function () {
         $('.nav-sidebar a[href="{{ route('entradas_salidas.filtradas') }}"]').addClass('active').parents('.nav-item.has-treeview').addClass('menu-open');
     });
+
+
+
+
+    $('#grupo_id').on('change', function () {
+    var grupoId = $(this).val();
+    if (grupoId) {
+        $.ajax({
+            url: '/obtener-fichas/' + grupoId,
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                $('#ficha_id').empty();
+                $('#ficha_id').append('<option value="">Seleccione una ficha</option>');
+                $.each(data, function (key, ficha) {
+                    $('#ficha_id').append('<option value="' + ficha.id + '">' + ficha.nombre + '</option>');
+                });
+            }
+        });
+    } else {
+        $('#ficha_id').empty();
+        $('#ficha_id').append('<option value="">Seleccione una ficha</option>');
+    }
+});
+
 </script>
 @endsection

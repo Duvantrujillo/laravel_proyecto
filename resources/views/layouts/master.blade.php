@@ -261,6 +261,8 @@
                         </li>
                     </ul>
                     <a href="{{route('geo.index')}}">fltro de modulos</a>
+                    <a href="{{route('mortality.create')}}">Registro de Mortalidad</a>
+                    <a href="{{route('mortality.index')}}">Filtro de Mortalidad</a>
                 </nav>
             </div>
         </aside>

@@ -186,5 +186,10 @@ class EntradaSalidaPersonalController extends Controller
             return view('auth.user.r-personal.r-entrada-salida.entradas-salidas-filtradas', compact('grupos', 'fichas', 'registros'));
         }
     
-
+        public function obtenerFichas($grupoId)
+        {
+            $fichas = Ficha::where('grupo_id', $grupoId)->get(); // Asumiendo que tu ficha tiene grupo_id
+            return response()->json($fichas);
+        }
+        
 }

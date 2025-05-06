@@ -22,12 +22,12 @@ class PondUnitCodeController extends Controller
             ];
         }
 
-        return view('auth.admin.geo-estanque.filter',compact('filtros2'));
+        return view('auth.user.geo-estanque.filter',compact('filtros2'));
     }
 
     public function create(){
         $filtros = GeoPond::all();
-        return view('auth.admin.geo-estanque.geo-estanque',compact ('filtros'));
+        return view('auth.user.geo-estanque.geo-estanque',compact ('filtros'));
     }
 
     public function store(Request $request){
