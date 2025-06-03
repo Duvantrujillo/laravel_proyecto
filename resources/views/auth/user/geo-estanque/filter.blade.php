@@ -7,8 +7,13 @@
             <div class="col-md-10">
                 <!-- Tarjeta principal -->
                 <div class="card card-outline card-primary elevation-2" style="border-top: 3px solid #007bff;">
-                    <div class="card-header bg-transparent border-0">
-                        <h3 class="card-title text-dark"><i class="fas fa-table mr-2"></i> Lista de Geomembranas</h3>
+                    <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                        <h3 class="card-title text-dark">
+                            <i class="fas fa-table mr-2"></i> Lista de Geomembranas
+                        </h3>
+                        <a href="{{ route('geo.create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Agregar módulo
+                        </a>
                     </div>
                     <div class="card-body p-4">
                         <!-- Tabla de geomembranas -->

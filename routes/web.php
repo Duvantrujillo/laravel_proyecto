@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GruposPersonalController;
 use App\Http\Controllers\RegisterPersonalController;
@@ -9,12 +10,22 @@ use App\Http\Controllers\observationcontroller;
 use App\Http\Controllers\GeoPondcontroller;
 use App\Http\Controllers\MortalityController;
 use App\Http\Controllers\PondUnitCodeController;
+use App\Http\Controllers\SpeciesController;
+use App\Http\Controllers\TypeController;
+use App\Http\Controllers\SowingController;
+use App\Http\Controllers\DietMonitoringController;
+use App\Http\Controllers\LoanController;
+use App\Http\Controllers\ReturnController;
+use App\Http\Controllers\VisitorController;
+use App\Http\Controllers\Auth\LoginController;
+
+
 
 // Ruta principal
 Route::get('/', function () {
     return view('auth.login');
-});
-
+})->name('login.form');
+Route::post('/login', [LoginController::class, 'login'])->name('login');
 // Autenticación
 Auth::routes(['middleware' => 'role.redirect']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -113,3 +124,141 @@ Route::get('/mortality/get-ponds', [MortalityController::class, 'index'])->name(
 
 Route::get('/obtener-fichas/{grupoId}', [EntradaSalidaPersonalController::class, 'obtenerFichas']);
 
+Route::get('/mortality/get-sowing-data', [MortalityController::class, 'getSowingData'])->name('mortality.getSowingData');
+
+
+
+
+
+
+
+Route::get('/species', [SpeciesController::class, 'index'])->name('species.index');
+Route::get('/species/create', [SpeciesController::class, 'create'])->name('species.create');
+Route::post('/species/store', [SpeciesController::class, 'store'])->name('species.store');
+Route::delete('/species/{species}', [SpeciesController::class, 'destroy'])->name('species.destroy');
+
+
+Route::post('species/type', [SpeciesController::class, 'storeType'])->name('species.storeType');
+Route::put('/species/{species}', [SpeciesController::class, 'update'])->name('species.update');
+Route::put('species/type/{type}', [SpeciesController::class, 'updateType'])->name('species.updateType');
+
+
+Route::put('/types/update/{type}', [SpeciesController::class, 'updateType'])->name('types.update');
+Route::get('/types/create', [TypeController::class, 'create'])->name('types.create');
+Route::post('/types/store', [TypeController::class, 'store'])->name('types.store');
+Route::delete('/types/{type}', [TypeController::class, 'destroy'])->name('types.destroy');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Route::get('/siembras/create', [SowingController::class, 'create'])->name('siembras.create');
+Route::post('/siembras', [SowingController::class, 'store'])->name('siembras.store');
+
+// Rutas para AJAX
+Route::get('/get-tipos/{especieId}', [SowingController::class, 'getTypes']);
+Route::get('/get-identificadores/{pondId}', [SowingController::class, 'getIdentifiers']);
+
+
+
+
+
+
+
+
+
+
+
+
+Route::get('/diet_monitoring', [DietMonitoringController::class, 'create'])->name('diet_monitoring.create'); //ruta para la vista del formulario
+Route::get('seguimiento-dieta/{sowing_id}', [DietMonitoringController::class, 'index'])->name('diet_monitoring.index');
+
+Route::post('/seguimiento-dieta', [DietMonitoringController::class, 'store'])->name('diet_monitoring.store');
+
+
+Route::get('/sowing/{sowing}/diet-monitoring', [App\Http\Controllers\DietMonitoringController::class, 'showBySowing'])
+    ->name('sowing.diet_monitoring');
+
+
+Route::post('/sowing/{id}/finish', [SowingController::class, 'finish'])->name('sowing.finish');
+
+
+
+
+
+
+
+
+
+
+
+
+
+Route::resource('loans', LoanController::class);
+Route::resource('returns', ReturnController::class);
+
+
+
+
+Route::post('/sowing/{id}/finish', [DietMonitoringController::class, 'finish'])->name('sowing.finish');
+Route::get('/seguimientos/terminados', [DietMonitoringController::class, 'terminated'])->name('diet_monitoring.terminated');
+
+
+
+
+
+
+
+Route::get('visitors-index', function () {
+    return redirect()->route('visitors.index');
+});
+
+Route::resource('visitors', VisitorController::class)->only([
+    'index',
+    'create',
+    'store'
+]);
+
+// Nueva vista para actualizar hora de salida
+
+Route::get('/visitors/checkout', [VisitorController::class, 'checkoutForm'])->name('visitors.checkout.form');
+Route::post('/visitors/checkout', [VisitorController::class, 'updateCheckout'])->name('visitors.checkout.update');
+
+
+// Filtro por fecha
+Route::get('/visitors/filter', [VisitorController::class, 'filter'])->name('visitors.filter');
+
+
+// Formulario público
+Route::get('/registro-visitante', [VisitorController::class, 'publicCreate'])->name('visitors.public.create');
+Route::post('/registro-visitante', [VisitorController::class, 'publicStore'])->name('visitors.public.store');
+
+
+Route::post('/config/registro-publico/toggle', [VisitorController::class, 'toggleFormState'])->name('visitors.toggle');
+
+
+
+
+use App\Http\Controllers\WaterQualityController;
+
+
+Route::get('/water-quality/create/{sowing}', [WaterQualityController::class, 'create'])->name('water_quality.create');
+Route::post('/water-quality/store/{sowing}', [WaterQualityController::class, 'store'])->name('water_quality.store');
+
+Route::get('/water-quality/history/{sowing}', [WaterQualityController::class, 'history'])
+
+
+    ->name('water_quality.history');
+
+use App\Http\Controllers\UserController;
+
+Route::resource('users', UserController::class);

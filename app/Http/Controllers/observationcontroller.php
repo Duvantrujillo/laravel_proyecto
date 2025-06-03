@@ -57,7 +57,7 @@ class observationcontroller extends Controller
             'observation' => $request->observation
         ]);
 
-        return redirect()->route('observacion.create');
+        return redirect()->route('observacion.create')->with('success', 'La herramienta fue creada correctamente');
     }
 
     /**
@@ -125,6 +125,6 @@ class observationcontroller extends Controller
         $observacion = observation::findOrfail($id);
         $observacion -> delete();
 
-        return redirect()->route('observacion.index')->with('success','herramienta elimnada correctamente');
+        return redirect()->route('observacion.index')->with('eliminada','herramienta elimnada correctamente');
     }
 }

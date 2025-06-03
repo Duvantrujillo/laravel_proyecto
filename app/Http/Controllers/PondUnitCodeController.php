@@ -55,7 +55,7 @@ class PondUnitCodeController extends Controller
 
         if($existe){
             return redirect()->route('geo.create')
-                ->with('error', 'este numero ya esta en uso en un ' . $pondType . ', porfaro usa otro');
+                ->with('error', 'este numero ya esta en uso en  ' . $pondType . ', porfavor usa otro numero');
         }
 
         // Si no existe, crear el registro
@@ -63,6 +63,6 @@ class PondUnitCodeController extends Controller
             'identificador'=> $request->idficador,
             'pond_id'=> $request->pond_id,
         ]);
-        return redirect()->route('geo.create')->with('succes','el registro fue exitoso');
+        return redirect()->route('geo.create')->with('success','el registro fue exitoso');
     }
 }

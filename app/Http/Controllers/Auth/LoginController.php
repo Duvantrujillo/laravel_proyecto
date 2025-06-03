@@ -3,52 +3,46 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
-    use AuthenticatesUsers;
-
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = RouteServiceProvider::HOME;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function login(Request $request)
     {
-        $this->middleware('guest')->except('logout');
+        // Validación de campos
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        // Intentar login
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
+            $request->session()->regenerate();
+
+            // Redirigir según el rol
+            $user = Auth::user();
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->role === 'usuario') {
+                return redirect()->route('user.dashboard');
+            }
+
+            return redirect()->intended('/dashboard'); // fallback
+        }
+
+        // Si falla, volver con error
+        return back()->withErrors([
+            'email' => 'Las credenciales no son válidas.',
+        ])->onlyInput('email');
     }
 
-    public function redirectTo()
+    public function logout(Request $request)
     {
-        $role = auth()->user()->role;
-        switch ($role) {
-            case 'admin':
-                return route('admin.dashboard');
-            case 'usuario':
-                return route('user.dashboard');
-            
-            default:
-                return route('home');
-        }
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login.form');
     }
 }

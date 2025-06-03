@@ -17,6 +17,8 @@ class Mortality extends Model
         'observation',
         'pond_code_id',
         'user_id',
+        'sowing_id',
+        'cycle',
     ];
 
     public function user()
@@ -28,4 +30,9 @@ class Mortality extends Model
     {
         return $this->belongsTo(pond_unit_code::class, 'pond_code_id');
     }
+    public function sowing()
+{
+    return $this->belongsTo(Sowing::class);
+}
+
 }

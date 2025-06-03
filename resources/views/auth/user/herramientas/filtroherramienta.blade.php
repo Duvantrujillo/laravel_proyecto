@@ -79,11 +79,34 @@
         </div>
     </div>
 </div>
+
+   @if (session('correcto'))
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            Swal.fire({
+                title: '{{ session('correcto') }}',
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+            });
+        </script>
+    @endif
+   @if (session('eliminada'))
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            Swal.fire({
+                title: '{{ session('eliminada') }}',
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+            });
+        </script>
+    @endif
+
+
+
+
 @endforeach
 
-<script>
-    alert ("{{session('success')}}")
-</script>
+
 
 <!-- Dependencias de Bootstrap -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">

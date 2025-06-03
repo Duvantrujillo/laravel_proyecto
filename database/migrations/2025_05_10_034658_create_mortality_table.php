@@ -21,6 +21,8 @@ class CreateMortalityTable extends Migration
             $table->text('observation')->nullable();
             $table->foreignId('pond_code_id')->constrained('pond_unit_codes')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('sowing_id')->nullable()->constrained('sowing')->onDelete('cascade');
+            $table->integer('cycle')->default(1);
             $table->timestamps();
         });
     }
@@ -34,6 +36,6 @@ class CreateMortalityTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('mortality');
+        Schema::dropIfExists('mortalities');
     }
 }

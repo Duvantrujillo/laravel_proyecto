@@ -25,7 +25,8 @@
                                                 <option value="">Seleccione un grupo</option>
                                                 @foreach ($grupos as $items)
                                                     <option value="{{ $items->id }}">{{ $items->nombre }}
-                                                        ({{ $items->numero_ficha }})</option>
+                                                        ({{ $items->numero_ficha }})
+                                                    </option>
                                                 @endforeach
                                             </select>
                                             @error('grupo')
@@ -143,21 +144,28 @@
 
                             <!-- Mensajes -->
                             @if (session('success'))
-                                <div class="alert alert-success alert-dismissible mt-3 fade show" role="alert">
-                                    <i class="fas fa-check-circle mr-2"></i> {{ session('success') }}
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
+                                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                                <script>
+                                    Swal.fire({
+                                        title: '{{ session('success') }}',
+                                        icon: 'success',
+                                        confirmButtonText: 'Aceptar'
+                                    });
+                                </script>
                             @endif
+
                             @if ($errors->any() && !session('success'))
-                                <div class="alert alert-danger alert-dismissible mt-3 fade show" role="alert">
-                                    <i class="fas fa-exclamation-circle mr-2"></i> Por favor, corrige los errores.
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
+                                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                                <script>
+                                    Swal.fire({
+                                        title: 'Errores de validación',
+                                        html: `{!! implode('<br>', $errors->all()) !!}`,
+                                        icon: 'error',
+                                        confirmButtonText: 'Entendido'
+                                    });
+                                </script>
                             @endif
+
                         </div>
                     </div>
                 </div>
@@ -188,7 +196,7 @@
             const seleccionarTodosVisito = document.getElementById('seleccionarTodosVisito');
             const seleccionarTodosBtn = document.getElementById('seleccionarTodosBtn');
             const seleccionarTodosBtnText = seleccionarTodosBtn.querySelector('span') ||
-            seleccionarTodosBtn; // Si no hay span, usa el botón directamente
+                seleccionarTodosBtn; // Si no hay span, usa el botón directamente
             const seleccionarTodasFechasBtn = document.getElementById('seleccionarTodasFechasBtn');
             const seleccionarTodasFechasBtnText = seleccionarTodasFechasBtn.querySelector('span') ||
                 seleccionarTodasFechasBtn;

@@ -10,4 +10,9 @@ class observation extends Model
     use HasFactory;
     protected $table = 'observations';
     protected $fillable = ['amount', 'product', 'observation'];
+    public function loans()
+{
+    return $this->hasMany(Loan::class);
+}
+
 }

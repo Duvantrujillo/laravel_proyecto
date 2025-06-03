@@ -62,7 +62,7 @@ class EntradaSalidaPersonalController extends Controller
                 }
             }
 
-            return redirect()->route('entrada_salida.create')->with('success', 'Registros de entrada/salida guardados correctamente.');
+            return redirect()->route('entrada_salida.create')->with('success', 'Registros de entrada guardados correctamente.');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Hubo un error al guardar los registros: ' . $e->getMessage()]);
         }
@@ -131,7 +131,7 @@ class EntradaSalidaPersonalController extends Controller
         entrada_salida_personal::whereIn('id', $request->ids)
             ->update(['fecha_hora_salida' => $request->fecha_salida]);
     
-        return redirect()->route('entrada_salida.index')->with('success', 'Fecha y hora de salida actualizadas correctamente.');
+        return redirect()->route('entrada_salida.index')->with('success', 'Fecha y hora de salida registradas correctamente.');
     }
 
 
@@ -190,6 +190,5 @@ class EntradaSalidaPersonalController extends Controller
         {
             $fichas = Ficha::where('grupo_id', $grupoId)->get(); // Asumiendo que tu ficha tiene grupo_id
             return response()->json($fichas);
-        }
-        
+        }        
 }
