@@ -15,4 +15,8 @@ class GeoPond extends Model
     protected $fillable = [
         'name',
     ];
+    public function identificadores()
+{
+    return $this->hasMany(pond_unit_code::class, 'pond_id');
+}
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,10 +11,11 @@ class register_personal extends Model
     protected $table = 'register_personal';
     protected $fillable = ['id', 'nombre', 'numero_documento', 'numero_telefono', 'correo', 'grupo', 'fichas'];
 
-    public function grupo()
-    {
-        return $this->belongsTo(grupos_personal::class, 'grupo','id');
-    }
+  public function grupo()
+{
+    return $this->belongsTo(grupos_personal::class, 'grupo', 'id');
+}
+
 
     public function ficha()
     {

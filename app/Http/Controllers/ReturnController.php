@@ -35,7 +35,7 @@ class ReturnController extends Controller
                             ->orderBy('return_date', 'desc')
                             ->get();
 
-        return view('auth.user.herramientas.tool_loans.filter', 
+        return view('auth.admin.herramientas.tool_loans.filter', 
             compact('returns', 'activeLoans', 'completedReturns'));
     }
 
@@ -47,7 +47,7 @@ class ReturnController extends Controller
     public function create()
     {
         $loans = Loan::with('observation')->get();
-        return view('auth.user.herramientas.tool_loans.index', compact('loans'));
+        return view('auth.admin.herramientas.tool_loans.index', compact('loans'));
     }
 
     /**

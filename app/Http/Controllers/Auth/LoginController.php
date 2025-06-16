@@ -5,35 +5,67 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 
 class LoginController extends Controller
 {
+
+    public function showLoginForm()
+    {
+        return view('auth.login'); // Asegúrate que esta vista exista
+    }
+
     public function login(Request $request)
     {
-        // Validación de campos
+        // Validar credenciales
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        // Intentar login
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            $request->session()->regenerate();
+        $email = $request->input('email');
+        $throttleKey = 'login-attempts:' . $email;
 
-            // Redirigir según el rol
-            $user = Auth::user();
-            if ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            } elseif ($user->role === 'usuario') {
-                return redirect()->route('user.dashboard');
-            }
-
-            return redirect()->intended('/dashboard'); // fallback
+        // Verificar límite de intentos
+        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return back()->withErrors([
+                'email' => "Demasiados intentos fallidos. Intenta de nuevo en $seconds segundos."
+            ])->onlyInput('email');
         }
 
-        // Si falla, volver con error
+        // Intentar autenticación
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
+            RateLimiter::clear($throttleKey);
+            $request->session()->regenerate();
+
+            $user = Auth::user();
+
+            $state = strtolower(trim(preg_replace('/[\s\t\n\r]+/', '', $user->state)));
+
+            if ($state === 'bloqueado') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Tu cuenta está bloqueada. Contacta al administrador.'
+                ])->onlyInput('email');
+            }
+
+
+            if ($state === 'activo') {
+                return redirect()->route($user->role === 'admin' ? 'admin.dashboard' : 'pasante.dashboard');
+            }
+
+            Auth::logout();
+            return back()->withErrors([
+                'email' => 'Estado de cuenta desconocido. Contacta al administrador.'
+            ])->onlyInput('email');
+        }
+
+        // Si falla la autenticación, contar el intento fallido
+        RateLimiter::hit($throttleKey, 60); // bloquea 10 intentos en 60 segundos
+
         return back()->withErrors([
-            'email' => 'Las credenciales no son válidas.',
+            'email' => 'Correo o contraseña incorrectos.'
         ])->onlyInput('email');
     }
 

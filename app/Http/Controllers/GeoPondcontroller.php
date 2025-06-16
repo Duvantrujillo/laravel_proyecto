@@ -24,7 +24,7 @@ class GeoPondcontroller extends Controller
     public function create()
     {
         $filtros = GeoPond::all();
-        return view('auth.user.geo-estanque.geo-estanque',compact ('filtros'));
+        return view('auth.admin.geo-estanque.geo-estanque',compact ('filtros'));
     }
 
     /**

@@ -53,7 +53,7 @@ class MortalityController extends Controller
         }
 
         $lakes = \App\Models\GeoPond::all();
-        return view('auth.user.Unit_registration.Mortality.form', compact('lakes'));
+        return view('auth.admin.Unit_registration.Mortality.form', compact('lakes'));
     }
 
     public function store(Request $request)
@@ -167,7 +167,7 @@ class MortalityController extends Controller
             $filtro = collect();
         }
 
-        return view('auth.user.Unit_registration.Mortality.Filtro', compact('filtro', 'expected', 'actual'));
+        return view('auth.admin.Unit_registration.Mortality.Filtro', compact('filtro', 'expected', 'actual'));
     }
 
     public function getSowingData(Request $request)

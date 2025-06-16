@@ -13,7 +13,7 @@ class EntradaSalidaPersonalController extends Controller
     public function create()
     {
         $grupos = grupos_personal::all();
-        return view('auth.user.r-personal.r-entrada-salida.r-entrada-salida', compact('grupos'));
+        return view('auth.admin.r-personal.r-entrada-salida.r-entrada-salida', compact('grupos'));
     }
 
     public function getFichasPorGrupo(Request $request)
@@ -106,7 +106,7 @@ class EntradaSalidaPersonalController extends Controller
         $grupos = grupos_personal::all();
         $fichas = Ficha::all();
     
-        return view('auth.user.r-personal.r-entrada-salida.salida', [
+        return view('auth.admin.r-personal.r-entrada-salida.salida', [
             'registros' => $registros,
             'filtros' => $filtros,
             'grupos' => $grupos,
@@ -183,7 +183,7 @@ class EntradaSalidaPersonalController extends Controller
     
             $registros = $registros->orderBy('fecha_hora_ingreso', 'desc')->paginate(10);
     
-            return view('auth.user.r-personal.r-entrada-salida.entradas-salidas-filtradas', compact('grupos', 'fichas', 'registros'));
+            return view('auth.admin.r-personal.r-entrada-salida.entradas-salidas-filtradas', compact('grupos', 'fichas', 'registros'));
         }
     
         public function obtenerFichas($grupoId)

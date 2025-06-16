@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class DietMonitoring extends Model
 {
     use HasFactory;
-protected $table = 'diet_monitorings';
+    protected $table = 'diet_monitorings';
     protected $fillable = [
         'sampling_date',
         'average_weight',
@@ -30,5 +30,11 @@ protected $table = 'diet_monitorings';
     public function sowing()
     {
         return $this->belongsTo(Sowing::class);
+    }
+
+
+    public function feedRecords()
+    {
+        return $this->hasMany(FeedRecord::class);
     }
 }

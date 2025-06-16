@@ -1,6 +1,8 @@
-<h1>bienvenido Usuario</h1>
+@extends('layouts.master')
 
-<form action= "{{ route('logout') }}" method="post">
-    @csrf
-    <button type="submit">cerrar seccion</button>
-</form>
+@section('content')
+    <div class="container">
+        <h1>Bienvenido al Dashboard</h1>
+        <p>Aquí va el contenido principal.</p>
+    </div>
+@endsection

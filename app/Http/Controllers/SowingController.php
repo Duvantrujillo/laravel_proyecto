@@ -34,11 +34,41 @@ class SowingController extends Controller
         $sowings = $query->get(); // Obtener las siembras con los filtros aplicados
 
 
-        return view('auth.user.Encabezado_Ajuste_Dieta.form', compact('species', 'ponds', 'sowings'));
+        return view('auth.admin.Encabezado_Ajuste_Dieta.form', compact('species', 'ponds', 'sowings'));
     }
 
     public function store(Request $request)
 {
+
+$camposNumericos = [
+        'initial_biomass',
+        'initial_feeding_frequency',
+        'fish_count',
+        'area',
+        'initial_weight',
+        'total_weight',
+        'initial_density',
+        ];
+    
+    foreach ($camposNumericos as $campo) {
+        if ($request->has($campo)) {
+            $valor = $request->input($campo);
+
+            // Elimina puntos de miles y reemplaza coma decimal por punto
+            $valor = str_replace('.', '', $valor);
+            $valor = str_replace(',', '.', $valor);
+
+            // Si es fish_count (entero) forzar int
+            if ($campo === 'fish_count') {
+                $valor = intval(floatval($valor));
+            } else {
+                $valor = floatval($valor);
+            }
+
+            // Sobrescribe el valor en la request
+            $request->merge([$campo => $valor]);
+        }
+    }
     // Validación
     $validated = $request->validate([
         'sowing_date' => 'required|date',

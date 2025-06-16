@@ -10,12 +10,12 @@ class VisitorController extends Controller
     public function index()
     {
         $visitors = Visitor::all();
-        return view('auth.user.visitors.index', compact('visitors'));
+        return view('auth.admin.visitors.index', compact('visitors'));
     }
 
     public function create()
     {
-        return view('auth.user.visitors.create');
+        return view('auth.admin.visitors.create');
     }
 
     public function store(Request $request)
@@ -39,7 +39,7 @@ class VisitorController extends Controller
     public function checkoutForm()
 {
     $visitors = Visitor::whereNull('exit_time')->get();
-    return view('auth.user.visitors.checkout', compact('visitors'));
+    return view('auth.admin.visitors.checkout', compact('visitors'));
 }
 
 
@@ -68,14 +68,14 @@ public function filter(Request $request)
     }
 
     $visitors = $query->get();
-    return view('auth.user.visitors.index', compact('visitors'));
+    return view('auth.admin.visitors.index', compact('visitors'));
 }
 
 
 public function publicCreate()
 {
     if (!Cache::get('formulario_publico_activo', true)) {
-        return view('auth.user.visitors.deactivated _form');
+        return view('auth.admin.visitors.deactivated _form');
     }
 
     $a = rand(1, 10);
@@ -86,7 +86,7 @@ public function publicCreate()
     session(['pregunta_seguridad_texto' => $pregunta]);
     session(['pregunta_seguridad_respuesta' => $respuesta]);
 
-    return view('auth.user.visitors.public', ['pregunta' => $pregunta]);
+    return view('auth.admin.visitors.public', ['pregunta' => $pregunta]);
 }
 
 

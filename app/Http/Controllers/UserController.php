@@ -28,13 +28,13 @@ class UserController extends Controller
     $users = $query->orderBy('created_at', 'desc')->get();
 
 
-    return view('auth.user.intern.index', compact('users'));
+    return view('auth.admin.intern.index', compact('users'));
 }
 
     // Mostrar formulario de registro
     public function create()
     {
-        return view('auth.user.intern.register');
+        return view('auth.admin.intern.register');
     }
 
     // Procesar registro nuevo usuario
@@ -46,7 +46,7 @@ class UserController extends Controller
             'document' => 'required|string|max:20|unique:users,document',
             'phone' => 'required|string|max:20',
             'state' => 'required|in:activo,inactivo,bloqueado',
-            'role' => 'required|in:admin,usuario',
+            'role' => 'required|in:admin,pasante',
             'password' => 'required|string|min:6|confirmed',
         ], [
             'name.required' => 'El nombre es obligatorio.',
@@ -90,7 +90,7 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        return view('auth.user.intern.edit', compact('user'));
+        return view('auth.admin.intern.edit', compact('user'));
     }
 
     // Actualizar usuario
@@ -104,7 +104,7 @@ class UserController extends Controller
             'document' => 'required|string|max:20|unique:users,document,' . $user->id,
             'phone' => 'required|string|max:20',
             'state' => 'required|in:activo,inactivo,bloqueado',
-            'role' => 'required|in:admin,usuario',
+            'role' => 'required|in:admin,pasante',
             'password' => 'nullable|string|min:6|confirmed',
         ], [
             'name.required' => 'El nombre es obligatorio.',

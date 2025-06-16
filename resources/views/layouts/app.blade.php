@@ -9,27 +9,41 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
-    <!-- Styles -->
+    <!-- App Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+
+    <!-- Bootstrap (opcional si no está en app.css) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- SweetAlert2 (siempre disponible para las vistas) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Scripts personalizados por vistas -->
+    @yield('head')
 </head>
 <body>
-    <script>
+    {{-- Desactiva el logout automático al cerrar la pestaña (opcional, peligroso) --}}
+    {{-- <script>
         window.addEventListener('beforeunload', function () {
             navigator.sendBeacon('/logout');
         });
-    </script>
-    
+    </script> --}}
 
-        <main class="py-4">
-            @yield('content')
-        </main>
-    </div>
+    <main class="py-4">
+        @yield('content')
+    </main>
+
+    <!-- App Script -->
+    <script src="{{ asset('js/app.js') }}" defer></script>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JS de cada vista -->
+    @yield('scripts')
 </body>
 </html>

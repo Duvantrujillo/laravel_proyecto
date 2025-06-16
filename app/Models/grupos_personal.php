@@ -7,7 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class grupos_personal extends Model
 {
     use HasFactory;
+    protected $table = 'grupos_personal'; // Tabla específica
+    protected $fillable = ['nombre']; // Solo los campos editable
 
-    protected $table = 'grupos_personal'; // Especifica la tabla exacta
-    protected $fillable = ['id', 'nombre']; // Ajusta según tus columnas
+      public function fichas()
+    {
+        return $this->hasMany(Ficha::class, 'grupo_id');
+    }
 }

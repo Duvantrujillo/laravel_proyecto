@@ -16,4 +16,5 @@ class Ficha extends Model
     {
         return $this->belongsTo(grupos_personal::class);
     }
+    
 }

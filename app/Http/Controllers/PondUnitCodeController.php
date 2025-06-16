@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -7,62 +8,149 @@ use App\Models\pond_unit_code;
 
 class PondUnitCodeController extends Controller
 {
-    public function index(){
-        // Obtener todos los registros de pond_unit_code y agruparlos por pond_id
-        $pondUnitCodes = pond_unit_code::with('pond')->get()->groupBy('pond_id');
-        $filtros2 = [];
-        
-        // Construir un array con el nombre del estanque y sus identificadores
-        foreach ($pondUnitCodes as $pond_id => $codes) {
-            $pond = $codes->first()->pond; // Obtener el estanque asociado
-            $identificadores = $codes->pluck('identificador')->toArray(); // Obtener todos los identificadores
-            $filtros2[] = [
-                'pond_name' => $pond ? $pond->name : 'Sin nombre',
-                'identificadores' => $identificadores,
-            ];
-        }
+    // Mostrar la lista de estanques y sus identificadores
+  public function index()
+{
+    // Obtener todas las geomembranas con sus identificadores relacionados (pueden estar vacíos)
+    $geomembranas = GeoPond::with('identificadores')->get();
 
-        return view('auth.user.geo-estanque.filter',compact('filtros2'));
-    }
+    $filtros2 = $geomembranas->map(function ($geo) {
+        return [
+            'pond_id' => $geo->id,
+            'pond_name' => $geo->name,
+            'identificadores' => $geo->identificadores->map(function ($id) {
+                return [
+                    'id' => $id->id,
+                    'identificador' => $id->identificador,
+                    'pond_id' => $id->pond_id,
+                ];
+            })->toArray()
+        ];
+    });
 
-    public function create(){
+    return view('auth.admin.geo-estanque.filter', compact('filtros2'));
+}
+
+    // Mostrar formulario para crear identificador
+    public function create()
+    {
         $filtros = GeoPond::all();
-        return view('auth.user.geo-estanque.geo-estanque',compact ('filtros'));
+        return view('auth.admin.geo-estanque.geo-estanque', compact('filtros'));
     }
 
-    public function store(Request $request){
+    // Guardar nuevo identificador
+    public function store(Request $request)
+    {
         $request->validate([
             'idficador' => 'required|integer',
             'pond_id' => 'required|exists:geoponds,id',
         ]);
 
-        // Obtener el estanque seleccionado
         $pond = GeoPond::find($request->pond_id);
-
-        // Extraer el tipo de estanque del nombre (por ejemplo, "Lago 1" -> "Lago")
         $nameParts = explode(' ', $pond->name);
-        $pondType = $nameParts[0]; // El tipo es la primera palabra (por ejemplo, "Lago", "Estanque")
+        $pondType = $nameParts[0];
 
-        // Obtener los IDs de todos los estanques del mismo tipo
-        $sameTypePondIds = GeoPond::where('name', 'like', $pondType . '%')
-            ->pluck('id')
-            ->toArray();
+        $sameTypePondIds = GeoPond::where('name', 'like', $pondType . '%')->pluck('id')->toArray();
 
-        // Verificar si el identificador ya existe en un estanque del mismo tipo
         $existe = pond_unit_code::where('identificador', $request->idficador)
             ->whereIn('pond_id', $sameTypePondIds)
             ->exists();
 
-        if($existe){
+        if ($existe) {
             return redirect()->route('geo.create')
-                ->with('error', 'este numero ya esta en uso en  ' . $pondType . ', porfavor usa otro numero');
+                ->with('error', 'Este número ya está en uso en ' . $pondType . ', por favor usa otro.');
         }
 
-        // Si no existe, crear el registro
         pond_unit_code::create([
-            'identificador'=> $request->idficador,
-            'pond_id'=> $request->pond_id,
+            'identificador' => $request->idficador,
+            'pond_id' => $request->pond_id,
         ]);
-        return redirect()->route('geo.create')->with('success','el registro fue exitoso');
+
+        return redirect()->route('geo.create')->with('success', 'Registro exitoso.');
     }
+
+    // Mostrar formulario para editar identificador
+    public function edit($id)
+    {
+        $identificador = pond_unit_code::findOrFail($id);
+        $estanques = GeoPond::all();
+        return view('auth.admin.geo-estanque.edit', compact('identificador', 'estanques'));
+    }
+
+    // Actualizar identificador
+ public function update(Request $request, $id)
+{
+    $request->validate([
+        'idficador' => 'required|integer',
+        'pond_id' => 'required|exists:geoponds,id',
+    ]);
+
+    // Validar si ese identificador ya existe en el mismo estanque y no sea el mismo registro
+    $existe = pond_unit_code::where('identificador', $request->idficador)
+        ->where('pond_id', $request->pond_id)
+        ->where('id', '!=', $id)
+        ->exists();
+
+    if ($existe) {
+        return back()->with('error', 'Este identificador ya está asignado en este estanque.');
+    }
+
+    $identificador = pond_unit_code::findOrFail($id);
+    $identificador->update([
+        'identificador' => $request->idficador,
+        'pond_id' => $request->pond_id
+    ]);
+
+   return back()->with('success', '¡Identificador registrado correctamente!');
+
+}
+
+
+    // Eliminar identificador
+    public function destroy($id)
+    {
+        $identificador = pond_unit_code::findOrFail($id);
+        $identificador->delete();
+        return redirect()->route('geo.index')->with('success', 'Identificador eliminado.');
+    }
+
+    // Mostrar formulario para editar el nombre del estanque
+    public function editEstanque($pond_id)
+    {
+        $pond = GeoPond::findOrFail($pond_id);
+        return view('auth.admin.geo-estanque.edit-nombre', compact('pond'));
+    }
+
+    // Actualizar nombre del estanque
+ public function updateEstanque(Request $request, $pond_id)
+{
+    $request->validate([
+        'name' => 'required|string|max:255|unique:geoponds,name,' . $pond_id,
+    ], [
+        'name.unique' => 'Este nombre ya está en uso. Por favor, elige otro.',
+        'name.required' => 'El nombre del estanque es obligatorio.',
+    ]);
+
+    $pond = GeoPond::findOrFail($pond_id);
+    $pond->name = $request->name;
+    $pond->save();
+
+    return back()->with('success', '¡Guardado correctamente!');
+
+}
+
+
+    public function deleteEstanque($pond_id)
+{
+    $pond = GeoPond::findOrFail($pond_id);
+    
+    // Borra primero los identificadores asociados
+    pond_unit_code::where('pond_id', $pond_id)->delete();
+    
+    // Luego borra el estanque
+    $pond->delete();
+
+    return redirect()->route('geo.index')->with('success', 'Estanque eliminado con sus identificadores.');
+}
+
 }

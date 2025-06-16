@@ -10,7 +10,7 @@ class TypeController extends Controller
     public function create()
     {
         $species = Species::all();
-        return view('auth.user.species.Type.Typespecie', compact('species'));
+        return view('auth.admin.species.Type.Typespecie', compact('species'));
     }
 
    public function store(Request $request)

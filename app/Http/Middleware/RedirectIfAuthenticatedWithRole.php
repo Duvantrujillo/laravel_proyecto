@@ -16,19 +16,21 @@ class RedirectIfAuthenticatedWithRole
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next)
-    {
-        if (Auth::check()){
-            $role = Auth::user()->role;
+  public function handle(Request $request, Closure $next)
+{
+    if (Auth::check()) {
+        $role = Auth::user()->role;
         switch ($role) {
             case 'admin':
-                return route('admin.dashboard');
-            case 'usuario':
-                return route('user.dashboard');
-            
+                return redirect()->route('admin.dashboard');
+            case 'pasante':
+                return redirect()->route('pasante.dashboard');
             default:
-                return route('home');
+                return redirect()->route('home');
         }
     }
+
+    return $next($request);
 }
+
 }

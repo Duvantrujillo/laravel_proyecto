@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use App\Models\grupos_personal;
 use App\Models\Ficha;
 use App\Models\register_personal;
@@ -10,13 +12,12 @@ use Illuminate\Http\Request;
 
 class RegisterPersonalController extends Controller
 {
-    public function index(){
-    }
+    public function index() {}
 
     public function create()
     {
         $grupos = grupos_personal::all();
-        return view('auth.user.r-personal.r-personal', compact('grupos'));
+        return view('auth.admin.r-personal.r-personal', compact('grupos'));
     }
 
     public function store(Request $request)
@@ -64,17 +65,18 @@ class RegisterPersonalController extends Controller
     public function indexGruposFichas()
     {
         $grupos = grupos_personal::all();
+
         $fichasPorGrupo = Ficha::with('grupo')
             ->get()
             ->groupBy('grupo_id')
             ->map(function ($fichas) {
                 return [
                     'grupo_nombre' => $fichas->first()->grupo->nombre ?? 'Sin grupo asignado',
-                    'numeros' => $fichas->pluck('nombre')->all()
+                    'numeros' => $fichas
                 ];
             });
 
-        return view('auth.user.r-personal.r-grupo.grupos-fichas', compact('grupos', 'fichasPorGrupo'));
+        return view('auth.admin.r-personal.r-grupo.grupos-fichas', compact('grupos', 'fichasPorGrupo'));
     }
 
     public function filtrarPersonal(Request $request)
@@ -96,9 +98,57 @@ class RegisterPersonalController extends Controller
 
         $personal = $personal->with(['grupo', 'ficha'])->paginate(10);
 
-        // Depuración opcional: Solo si necesitas inspeccionar los datos
-        // Log::info('Personal encontrado:', ['data' => $personal->items()]);
+        return view('auth.admin.r-personal.personal-filtrado', compact('grupos', 'fichas', 'personal'));
+    }
 
-        return view('auth.user.r-personal.personal-filtrado', compact('grupos', 'fichas', 'personal'));
+    public function edit($id)
+    {
+        $persona = register_personal::findOrFail($id);
+        $grupos = grupos_personal::all();
+        $fichas = Ficha::where('grupo_id', $persona->grupo)->get();
+
+        return view('auth.admin.r-personal.edit', compact('persona', 'grupos', 'fichas'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nombre' => 'required',
+            'numero_documento' => [
+                'required',
+                'numeric',
+                Rule::unique('register_personal')->ignore($id)
+            ],
+            'numero_telefono' => 'required|digits:10',
+            'correo' => 'required|email',
+            'grupo' => 'required|exists:grupos_personal,id',
+            'fichas' => 'required|exists:fichas,id',
+        ], [
+            'numero_documento.unique' => 'El número de documento ya está registrado.'
+        ]);
+
+        $persona = register_personal::findOrFail($id);
+        $persona->update([
+            'nombre' => ucwords(strtolower($request->nombre)),
+            'numero_documento' => $request->numero_documento,
+            'numero_telefono' => $request->numero_telefono,
+            'correo' => $request->correo,
+            'grupo' => $request->grupo,
+            'fichas' => $request->fichas,
+        ]);
+
+        return redirect()->back()->with('success', 'Información actualizada con éxito.');
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $persona = register_personal::findOrFail($id);
+            $persona->delete();
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            Log::error("Error al eliminar: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'No se pudo eliminar el registro.']);
+        }
     }
 }

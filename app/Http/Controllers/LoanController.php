@@ -27,7 +27,7 @@ class LoanController extends Controller
     public function create()
     {
         $items = Observation::all();
-        return view('auth.user.herramientas.tool_loans.create', compact('items'));
+        return view('auth.admin.herramientas.tool_loans.create', compact('items'));
     }
 
 
@@ -40,7 +40,6 @@ class LoanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'full_name' => 'required|string|max:255',
             'observation_id' => 'required|exists:observations,id',
             'quantity' => 'required|integer|min:1',
             'loan_date' => 'required|date',
@@ -59,7 +58,6 @@ class LoanController extends Controller
 
         // Crear el préstamo
         Loan::create([
-            'full_name' => $request->full_name,
             'observation_id' => $request->observation_id,
             'item' => $item->product,
             'quantity' => $request->quantity,
@@ -74,7 +72,7 @@ class LoanController extends Controller
         $item->amount -= $request->quantity;
         $item->save();
 
-        return redirect()->route('loans.create')->with('success', 'Loan registered successfully.');
+        return redirect()->route('loans.create')->with('success', 'herramienta prestada correctamente.');
     }
 
 

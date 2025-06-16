@@ -36,10 +36,10 @@ class UsersTableSeeder extends Seeder
                 'document' => '87654321',
                 'state' => 'activo',
                 'phone' => '0987654321',
-                'email' => 'user@example.com',
+                'email' => 'pasante@example.com',
                 'email_verified_at' => now(),
                 'password' => Hash::make('password'), // Encripta la contraseña
-                'role' => 'usuario',
+                'role' => 'pasante',
                 'remember_token' => null,
                 'created_at' => now(),
                 'updated_at' => now(),

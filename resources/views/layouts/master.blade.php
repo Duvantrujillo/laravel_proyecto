@@ -319,6 +319,15 @@
         }
     </style>
 </head>
+<script>
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || performance.getEntriesByType('navigation')[0]?.type === 'back_forward') {
+            document.querySelectorAll('form').forEach(function(form) {
+                form.reset();
+            });
+        }
+    });
+</script>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -332,16 +341,27 @@
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="toggleDarkMode" title="Cambiar tema">
-                        <i class="fas fa-moon"></i>
-                    </a>
-                </li>
+               
                 <li class="nav-item dropdown">
                     <a class="nav-link user-menu" href="#" id="navbarDropdown" data-toggle="dropdown"
                         aria-expanded="false">
                         <i class="fas fa-user-circle mr-1"></i>
+                        @if (Auth::check())
                         <span>{{ Auth::user()->name }}</span>
+                        @else
+                        <script>
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Sesión expirada',
+                                text: 'Tu sesión ha expirado. Serás redirigido al login.',
+                                showConfirmButton: false,
+                                timer: 3000
+                            }).then(() => {
+                                window.location.href = "{{ route('login') }}";
+                            });
+                        </script>
+                        @endif
+
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ route('logout') }}"
@@ -360,7 +380,12 @@
         <aside class="main-sidebar sidebar-light-primary elevation-4">
             <a href="#" class="brand-link animate__animated animate__fadeInLeft">
                 <i class="fas fa-cog brand-image"></i>
-                <span class="brand-text">Panel Admin</span>
+                @php
+                $rol = Auth::check() ? ucfirst(Auth::user()->role) : 'Invitado';
+                @endphp
+
+                <span class="brand-text"> {{ $rol }}</span>
+
             </a>
             <div class="sidebar">
                 <nav class="mt-3">
@@ -374,12 +399,17 @@
                                 <p>Tecnólogos <i class="fas fa-angle-left right"></i></p>
                             </a>
                             <ul class="nav nav-treeview">
+                                @auth
+                                @if (auth()->user()->role === 'admin')
                                 <li class="nav-item">
                                     <a href="{{ route('grupo.create') }}" class="nav-link">
                                         <i class="nav-icon fas fa-plus-circle"></i>
                                         <p>Nuevo Tecnólogo/Ficha</p>
                                     </a>
                                 </li>
+                                @endif
+                                @endauth
+
                                 <li class="nav-item">
                                     <a href="{{ route('grupos-fichas.index') }}" class="nav-link">
                                         <i class="nav-icon fas fa-list"></i>
@@ -411,6 +441,34 @@
                                 </li>
                             </ul>
                         </li>
+
+                        <!-- Gestión de Pasantes -->
+                        @auth
+                        @if (auth()->user()->role === 'admin')
+                        <li class="nav-header">Pasantes</li>
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-user-tie"></i>
+                                <p>Pasantes <i class="fas fa-angle-left right"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('users.create') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-user-plus"></i>
+                                        <p>Registrar Pasante</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('users.index') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-search"></i>
+                                        <p>Filtrar Pasantes</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        @endif
+                        @endauth
+
 
                         <!-- Control de Asistencia -->
                         <li class="nav-header">Asistencia</li>
@@ -449,12 +507,18 @@
                                 <p>Herramientas <i class="fas fa-angle-left right"></i></p>
                             </a>
                             <ul class="nav nav-treeview">
+                                @auth
+                                @if (auth()->user()->role === 'admin')
+                                <!-- Esto solo lo verá el administrador -->
                                 <li class="nav-item">
                                     <a href="{{ route('observacion.create') }}" class="nav-link">
                                         <i class="nav-icon fas fa-plus-square"></i>
                                         <p>Registrar Herramienta</p>
                                     </a>
                                 </li>
+                                @endif
+                                @endauth
+
                                 <li class="nav-item">
                                     <a href="{{ route('observacion.index') }}" class="nav-link">
                                         <i class="nav-icon fas fa-search"></i>
@@ -547,10 +611,11 @@
                                 <i class="nav-icon fas fa-user-friends"></i>
                                 <p>Invitados</p>
                             </a>
+                            <a href="{{ route('sowing.dashboard') }}" class="nav-link">
+                                <i class="nav-icon fas fa-user-friends"></i>
+                                <p>Graficas</p>
+                            </a>
                         </li>
-                        <a href="{{ route('users.create') }}" class="btn btn-block btn-danger">registrar pasante</a><br><br><br>
-                        <a href="{{ route('users.index') }}" class="btn btn-block btn-blue">Filtro pasante</a><br><br><br>
-
                     </ul>
                 </nav>
             </div>
@@ -632,6 +697,8 @@
         });
     </script>
     @yield('scripts')
+  
+
 </body>
 
 </html>

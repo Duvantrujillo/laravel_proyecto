@@ -15,12 +15,12 @@ class SpeciesController extends Controller
         $species = Species::when($search, function ($query, $search) {
             return $query->where('name', 'like', "%{$search}%");
         })->with('types')->paginate(10);
-        return view('auth.user.species.species_filter.Species_filter', compact('species', 'search'));
+        return view('auth.admin.species.species_filter.Species_filter', compact('species', 'search'));
     }
 
     public function create()
     {
-        return view('auth.user.species.Formspecies');
+        return view('auth.admin.species.Formspecies');
     }
 
     public function store(Request $request)

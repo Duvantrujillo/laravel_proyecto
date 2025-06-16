@@ -16,7 +16,6 @@ class CreateLoansTable extends Migration
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('observation_id')->constrained()->onDelete('cascade'); // Relación con la herramienta
-            $table->string('full_name');
             $table->string('item');         // puede ser redundante, pero te permite mostrar sin join si lo deseas
             $table->integer('quantity');
             $table->date('loan_date');

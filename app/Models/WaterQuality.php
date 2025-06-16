@@ -21,6 +21,7 @@ class WaterQuality extends Model
         'nitrates',
         'responsible',
         'sowing_id',
+        'justification',
         'user_id'
     ];
 
