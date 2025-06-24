@@ -15,17 +15,17 @@
                                 <div class="row mb-4">
                                     <!-- Selección del Grupo -->
                                     <div class="col-md-6">
-                                        <label for="grupo" class="d-block text-dark">Grupo</label>
+                                        <label for="grupo" class="d-block text-dark">Tecnologos</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text bg-light"><i class="fas fa-users"></i></span>
                                             </div>
                                             <select name="grupo" id="grupo"
                                                 class="form-control @error('grupo') is-invalid @enderror" required>
-                                                <option value="">Seleccione un grupo</option>
+                                                <option value="">Seleccione un Tecnologo</option>
                                                 @foreach ($grupos as $items)
                                                     <option value="{{ $items->id }}">{{ $items->nombre }}
-                                                        ({{ $items->numero_ficha }})
+                                                        {{ $items->numero_ficha }}
                                                     </option>
                                                 @endforeach
                                             </select>

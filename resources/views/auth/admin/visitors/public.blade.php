@@ -79,7 +79,7 @@
 <body>
     <div class="container mt-5">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-7">
                 <div class="card p-4">
                     <div class="text-center mb-4">
                         <h2 class="mb-3">Registro de Visitante</h2>
@@ -96,22 +96,15 @@
                     @if ($errors->any())
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                            <ul class="mb-0"></ul>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
 
                     <form method="POST" action="{{ route('visitors.public.store') }}">
                         @csrf
-
-                        <!-- Honeypot -->
                         <input type="text" name="website" style="display:none">
 
-                        <!-- Pregunta anti-bot dinámica -->
                         <div class="security-question mb-4">
                             <label class="icon-label">
                                 <i class="bi bi-shield-lock-fill"></i>
@@ -121,38 +114,35 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="icon-label"><i class="bi bi-person-fill"></i>Nombre</label>
                                 <input type="text" name="name" class="form-control" required value="{{ old('name') }}" placeholder="Ingrese su nombre completo">
                             </div>
-
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="icon-label"><i class="bi bi-card-text"></i>Documento</label>
                                 <input type="text" name="document" class="form-control" required value="{{ old('document') }}" placeholder="Número de documento">
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="icon-label"><i class="bi bi-telephone-fill"></i>Teléfono</label>
                                 <input type="text" name="phone" class="form-control" required value="{{ old('phone') }}" placeholder="Número de contacto">
                             </div>
-
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="icon-label"><i class="bi bi-envelope-fill"></i>Email</label>
                                 <input type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="Correo electrónico (opcional)">
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="icon-label"><i class="bi bi-calendar-date-fill"></i>Fecha de Entrada</label>
-                                <input type="date" name="entry_date" class="form-control" required value="{{ old('entry_date') }}">
+                                <input type="date" name="entry_date" class="form-control" id="entry_date" readonly>
                             </div>
-
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="icon-label"><i class="bi bi-clock-fill"></i>Hora de Entrada</label>
-                                <input type="time" name="entry_time" class="form-control" required value="{{ old('entry_time') }}">
+                                <input type="time" name="entry_time" class="form-control" id="entry_time" readonly>
                             </div>
                         </div>
 
@@ -172,7 +162,45 @@
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Mostrar alertas -->
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: '¡Registro exitoso!',
+                text: '{{ session('success') }}',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Aceptar'
+            });
+        </script>
+    @endif
+
+    @if ($errors->any())
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Hubo un problema',
+                html: `{!! implode('<br>', $errors->all()) !!}`,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Entendido'
+            });
+        </script>
+    @endif
+
+    <!-- Script para asignar fecha y hora -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const fecha = new Date();
+            const pad = (n) => n.toString().padStart(2, '0');
+            document.getElementById('entry_date').value = `${fecha.getFullYear()}-${pad(fecha.getMonth() + 1)}-${pad(fecha.getDate())}`;
+            document.getElementById('entry_time').value = `${pad(fecha.getHours())}:${pad(fecha.getMinutes())}`;
+        });
+    </script>
 </body>
 </html>

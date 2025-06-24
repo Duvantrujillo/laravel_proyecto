@@ -3,62 +3,40 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\observation;
 use App\Models\Loan;
-
+use App\Models\Tool;
 
 class LoanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        $items = Observation::all();
-        return view('auth.admin.herramientas.tool_loans.create', compact('items'));
+        $items = Tool::all();
+        return view('auth.admin.Tool.Tool_control.tool_loans', compact('items'));
     }
 
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'observation_id' => 'required|exists:observations,id',
+            'tool_id' => 'required|exists:tools,id',
             'quantity' => 'required|integer|min:1',
             'loan_date' => 'required|date',
             'requester_name' => 'required|string|max:255',
             'requester_id' => 'required|string|max:255',
         ]);
 
-        // Buscar herramienta
-        $item = Observation::find($request->observation_id);
+        $item = Tool::find($request->tool_id);
 
-        // Validar si hay suficiente cantidad
         if ($request->quantity > $item->amount) {
             return back()->with('error', 'Los Datos ingresados son incorrectos, no hay suficiente cantidad disponible.');
-      
         }
 
-        // Crear el préstamo
         Loan::create([
-            'observation_id' => $request->observation_id,
+            'tool_id' => $request->tool_id,
             'item' => $item->product,
             'quantity' => $request->quantity,
             'loan_date' => $request->loan_date,
@@ -68,54 +46,27 @@ class LoanController extends Controller
             'loan_status' => $request->loan_status,
         ]);
 
-        // Restar cantidad en inventario
         $item->amount -= $request->quantity;
         $item->save();
 
-        return redirect()->route('loans.create')->with('success', 'herramienta prestada correctamente.');
+        return redirect()->route('loans.create')->with('success', 'Herramienta prestada correctamente.');
     }
 
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //

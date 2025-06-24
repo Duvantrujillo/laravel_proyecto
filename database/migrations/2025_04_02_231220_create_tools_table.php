@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateObservationsTable extends Migration
+class CreateToolsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateObservationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('observations', function (Blueprint $table) {
+        Schema::create('tools', function (Blueprint $table) {
             $table->id();
             $table->integer('amount');
             $table->string('product');
@@ -29,6 +29,6 @@ class CreateObservationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('observations');
+        Schema::dropIfExists('tools');
     }
 }

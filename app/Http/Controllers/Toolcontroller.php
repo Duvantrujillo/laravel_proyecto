@@ -2,47 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\observation;
+use App\Models\Tool;
 use Illuminate\Http\Request;
 
-class observationcontroller extends Controller
+class ToolController extends Controller
 {
     public function create()
     {
-        return view('auth.admin.herramientas.formherramientas');
+        return view('auth.admin.Tool.register_tools');
     }
 
     public function index()
     {
-        $observaciones = observation::all();
-        return view('auth.admin.herramientas.filtroherramienta', compact('observaciones'));
+        $tools = Tool::all();
+        return view('auth.admin.Tool.Tool _warehouse', compact('tools'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'amount' => 'required|integer',
-            'product' =>  'required|string',
+            'product' => 'required|string',
             'observation' => 'required|string'
         ]);
         
-        if (observation::where('product', $request->product)->exists()) {
+        if (Tool::where('product', $request->product)->exists()) {
             return back()->with('error', 'Esta herramienta ya existe, no puedes agregarla nuevamente');
         }
 
-        observation::create([
+        Tool::create([
             'amount' => $request->amount,
             'product' => $request->product,
             'observation' => $request->observation
         ]);
 
-        return redirect()->route('observacion.create')->with('success', 'La herramienta fue creada correctamente');
+        return redirect()->route('Tool.create')->with('success', 'La herramienta fue creada correctamente');
     }
 
     public function edit($id)
     {
-        $observacion = observation::findOrFail($id);
-        return view('auth.admin.herramientas.filtroherramienta');
+        $tool = Tool::findOrFail($id);
+        // Asumo que aquí deberías enviar el tool a la vista para editar
+        return view('auth.admin.herramientas.editherramienta', compact('tool'));
     }
 
     public function update(Request $request, $id)
@@ -53,26 +54,26 @@ class observationcontroller extends Controller
             'observation' => 'required|string'
         ]);
 
-        if (observation::where('product', $request->product)->where('id', '!=', $id)->exists()) {
+        if (Tool::where('product', $request->product)->where('id', '!=', $id)->exists()) {
             return back()->withInput()->with('update', 'Este nombre ya está en uso. Usa otro nombre.');
         }
 
-        $observacion = observation::findOrFail($id);
+        $tool = Tool::findOrFail($id);
 
-        $observacion->update([
+        $tool->update([
             'amount' => $request->amount,
             'product' => $request->product,
             'observation' => $request->observation
         ]);
 
-        return redirect()->route('observacion.index')->with('correcto', 'La herramienta fue actualizada correctamente');
+        return redirect()->route('Tool.index')->with('correcto', 'La herramienta fue actualizada correctamente');
     }
 
     public function destroy($id)
     {
-        $observacion = observation::findOrfail($id);
-        $observacion->delete();
+        $tool = Tool::findOrFail($id);
+        $tool->delete();
 
-        return redirect()->route('observacion.index')->with('eliminada', 'Herramienta eliminada correctamente');
+        return redirect()->route('Tool.index')->with('eliminada', 'Herramienta eliminada correctamente');
     }
 }

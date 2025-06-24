@@ -10,8 +10,14 @@ class GraficController extends Controller
     // Mostrar el dashboard con el select de comparación
     public function index()
     {
-        // Cargar relaciones para mostrar nombres reales en lugar de IDs
-        $sowings = Sowing::with(['species', 'type', 'pond', 'identifier'])->get();
+        // Cargar relaciones con la más reciente incluida
+        $sowings = Sowing::with([
+            'species',
+            'type',
+            'pond',
+            'identifier',
+            'lastMonitoring'
+        ])->orderByDesc('id')->get();
 
         return view('auth.admin.grafic.grafic', [
             'sowings' => $sowings,
@@ -20,30 +26,42 @@ class GraficController extends Controller
         ]);
     }
 
-    // Procesar la comparación entre dos siembras
+    // Procesar la comparación entre siembras
     public function compare(Request $request)
     {
         $ids = $request->input('sowing_ids');
 
-        if (!$ids || count($ids) != 2) {
-            return redirect()->back()->withErrors('Debes seleccionar exactamente dos registros de siembra.');
+        // Validar que haya al menos una siembra seleccionada
+        if (!$ids || count($ids) < 1) {
+            return redirect()->back()->withErrors('Debes seleccionar al menos una siembra.');
         }
 
-        // Cargar las siembras seleccionadas con sus relaciones
-        $sowings = Sowing::with(['species', 'type', 'pond', 'identifier'])
-            ->whereIn('id', $ids)
-            ->get();
+        // Validar que no se comparen dos veces la misma siembra
+        if (count($ids) > 1 && count(array_unique($ids)) < count($ids)) {
+            return redirect()->back()->withErrors('No puedes seleccionar la misma siembra dos veces.');
+        }
 
-        // Comparación textual (esto se puede mejorar según tus necesidades)
-        $comparisonResult = "Comparación:\n\n" .
-            ($sowings[0]->identifier->code ?? 'Sin código') . " (ID: {$sowings[0]->id}) vs " .
-            ($sowings[1]->identifier->code ?? 'Sin código') . " (ID: {$sowings[1]->id})";
+        // Cargar las siembras seleccionadas con todas las relaciones necesarias
+        $sowings = Sowing::with([
+            'species',
+            'type',
+            'pond',
+            'identifier',
+            'mortalities',
+            'dietMonitorings.feedRecords',
+            'lastMonitoring'
+        ])->whereIn('id', $ids)->get();
 
-        // Devolver la vista con todos los datos necesarios
         return view('auth.admin.grafic.grafic', [
-            'sowings' => Sowing::with(['species', 'type', 'pond', 'identifier'])->get(), // para el select
-            'selectedSowings' => $sowings,      // para las tarjetas comparativas
-            'comparisonResult' => $comparisonResult,
+            'sowings' => Sowing::with([
+                'species',
+                'type',
+                'pond',
+                'identifier',
+                'lastMonitoring'
+            ])->orderByDesc('id')->get(),
+            'selectedSowings' => $sowings,
+            'comparisonResult' => null,
         ]);
     }
 }

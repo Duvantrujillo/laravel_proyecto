@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Loan;
 use App\Models\Observation;
 use App\Models\ReturnModel;
+use App\Models\Tool;
 use Carbon\Carbon;
 
 class ReturnController extends Controller
@@ -35,7 +36,7 @@ class ReturnController extends Controller
                             ->orderBy('return_date', 'desc')
                             ->get();
 
-        return view('auth.admin.herramientas.tool_loans.filter', 
+        return view('auth.admin.Tool.Tool_control.Record', 
             compact('returns', 'activeLoans', 'completedReturns'));
     }
 
@@ -46,8 +47,8 @@ class ReturnController extends Controller
      */
     public function create()
     {
-        $loans = Loan::with('observation')->get();
-        return view('auth.admin.herramientas.tool_loans.index', compact('loans'));
+        $loans = Loan::with('tool')->get();
+        return view('auth.admin.Tool.Tool_control.return_of_tools', compact('loans'));
     }
 
     /**
@@ -92,7 +93,7 @@ class ReturnController extends Controller
         $loan->save();
 
         // Actualizar inventario de herramientas
-        $item = Observation::find($loan->observation_id);
+        $item = Tool::find($loan->tool_id);
         $item->amount += $request->returned_quantity;
         $item->save();
 

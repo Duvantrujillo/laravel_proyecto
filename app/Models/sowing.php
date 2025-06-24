@@ -30,16 +30,16 @@ class Sowing extends Model
     ];
     public function species()
 {
-    return $this->belongsTo(Type::class, 'species_id');
-}
-public function pond()
-{
-    return $this->belongsTo(GeoPond::class, 'pond_id');
+    return $this->belongsTo(Species::class, 'species_id');
 }
 
 public function type()
 {
     return $this->belongsTo(Type::class, 'type_id'); // Aquí se usa 'type_id' como clave foránea
+}
+public function pond()
+{
+    return $this->belongsTo(GeoPond::class, 'pond_id');
 }
 
 public function dietMonitorings()
@@ -54,5 +54,12 @@ public function mortalities()
 {
     return $this->hasMany(Mortality::class);
 }
-
+public function feedRecords()
+{
+    return $this->hasMany(FeedRecord::class);
+}
+  public function lastMonitoring()
+    {
+        return $this->hasOne(DietMonitoring::class)->latestOfMany();
+    }
 }

@@ -10,7 +10,7 @@ class Loan extends Model
     use HasFactory;
 
     protected $fillable = [
-    'observation_id',
+    'tool_id',
     'item',
     'quantity',
     'loan_date',
@@ -22,9 +22,9 @@ class Loan extends Model
 ];
 
 
-    public function observation()
+    public function tool()
 {
-    return $this->belongsTo(Observation::class);
+    return $this->belongsTo(Tool::class);
 }
 
 public function returns()

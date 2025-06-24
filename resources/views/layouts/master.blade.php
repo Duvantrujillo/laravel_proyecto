@@ -21,6 +21,8 @@
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <!-- Estilos personalizados -->
+     <script src="https://cdn.tailwindcss.com"></script>
+
     @yield('styles')
     <style>
         :root {
@@ -378,15 +380,16 @@
 
         <!-- Sidebar -->
         <aside class="main-sidebar sidebar-light-primary elevation-4">
-            <a href="#" class="brand-link animate__animated animate__fadeInLeft">
-                <i class="fas fa-cog brand-image"></i>
-                @php
-                $rol = Auth::check() ? ucfirst(Auth::user()->role) : 'Invitado';
-                @endphp
+           <a href="#" class="brand-link animate__animated animate__fadeInLeft d-flex align-items-center">
+    <i class="fas fa-fish brand-image me-2" style="color: #3498db;"></i>
 
-                <span class="brand-text"> {{ $rol }}</span>
+    @php
+        $rol = Auth::check() ? ucfirst(Auth::user()->role) : 'Invitado';
+    @endphp
 
-            </a>
+    <span class="brand-text">{{ $rol }}</span>
+</a>
+
             <div class="sidebar">
                 <nav class="mt-3">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
@@ -430,13 +433,13 @@
                                 <li class="nav-item">
                                     <a href="{{ route('register.create') }}" class="nav-link">
                                         <i class="nav-icon fas fa-user-plus"></i>
-                                        <p>Agregar Aprendiz</p>
+                                        <p>Registrar Aprendiz</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('personal.filtrado') }}" class="nav-link">
                                         <i class="nav-icon fas fa-users"></i>
-                                        <p>Ver Registrados</p>
+                                        <p>Aprendices Registrados</p>
                                     </a>
                                 </li>
                             </ul>
@@ -461,7 +464,7 @@
                                 <li class="nav-item">
                                     <a href="{{ route('users.index') }}" class="nav-link">
                                         <i class="nav-icon fas fa-search"></i>
-                                        <p>Filtrar Pasantes</p>
+                                        <p>Pasantes Registrados</p>
                                     </a>
                                 </li>
                             </ul>
@@ -511,7 +514,7 @@
                                 @if (auth()->user()->role === 'admin')
                                 <!-- Esto solo lo verá el administrador -->
                                 <li class="nav-item">
-                                    <a href="{{ route('observacion.create') }}" class="nav-link">
+                                    <a href="{{ route('Tool.create') }}" class="nav-link">
                                         <i class="nav-icon fas fa-plus-square"></i>
                                         <p>Registrar Herramienta</p>
                                     </a>
@@ -520,21 +523,21 @@
                                 @endauth
 
                                 <li class="nav-item">
-                                    <a href="{{ route('observacion.index') }}" class="nav-link">
+                                    <a href="{{ route('Tool.index') }}" class="nav-link">
                                         <i class="nav-icon fas fa-search"></i>
-                                        <p>Filtrar Herramientas</p>
+                                        <p> Inventario de Herramientas</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('loans.create') }}" class="nav-link">
                                         <i class="nav-icon fas fa-hand-holding"></i>
-                                        <p>Prestar Herramientas</p>
+                                        <p>Solicitar Herramienta</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('returns.create') }}" class="nav-link">
                                         <i class="nav-icon fas fa-tools"></i>
-                                        <p>Herramientas en Uso</p>
+                                        <p>Entrega de Herramientas</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -611,10 +614,11 @@
                                 <i class="nav-icon fas fa-user-friends"></i>
                                 <p>Invitados</p>
                             </a>
-                            <a href="{{ route('sowing.dashboard') }}" class="nav-link">
-                                <i class="nav-icon fas fa-user-friends"></i>
-                                <p>Graficas</p>
-                            </a>
+                          <a href="{{ route('sowing.dashboard') }}" class="nav-link">
+    <i class="nav-icon fas fa-chart-bar"></i>
+    <p>Gráficas</p>
+</a>
+
                         </li>
                     </ul>
                 </nav>

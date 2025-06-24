@@ -6,10 +6,12 @@
             max-width: 900px;
             margin: auto;
             padding: 20px;
+            text-align: left;
         }
 
         .form-group {
             margin-bottom: 15px;
+            text-align: left;
         }
 
         label {
@@ -26,6 +28,7 @@
             margin-top: 5px;
             border-radius: 4px;
             border: 1px solid #ccc;
+            text-align: left;
         }
 
         button {
@@ -39,9 +42,8 @@
             cursor: pointer;
         }
 
-        /* Alineación para números */
-        input[type="text"].number-format {
-            text-align: right;
+        /* Ya no alineamos los .number-format a la derecha */
+        input.number-format {
             font-variant-numeric: tabular-nums;
             font-size: 15px;
         }
@@ -59,7 +61,6 @@
                 <input type="date" name="sampling_date" required>
             </div>
 
-            <!-- Cambié a input text para formatear -->
             <div class="form-group">
                 <label>Peso promedio (gr)</label>
                 <input type="text" name="average_weight" id="average_weight" class="number-format" required>
@@ -132,14 +133,11 @@
             const cumulativeMortalityInput = document.getElementById('cumulative_mortality');
             const weightGainInput = document.getElementById('weight_gain');
 
-            // Función para parsear números del formato es-CO a float JS
             function parseFormattedNumber(value) {
                 if (!value) return 0;
-                // Elimina puntos de miles y cambia coma por punto decimal
                 return parseFloat(value.replace(/\./g, '').replace(',', '.')) || 0;
             }
 
-            // Función para formatear números según es-CO y sin decimales innecesarios
             function formatSmart(value) {
                 const num = Number(value);
                 if (Number.isInteger(num)) {
@@ -162,7 +160,6 @@
             } else {
                 cumulativeMortalityInput.value = formatSmart(cumulativeMortality);
                 fishBalanceInput.value = formatSmart(fishBalanceFromServer);
-                // Si el campo avgWeightInput tiene valor (en texto formateado), parsear para cálculo
                 const lastW = parseFloat(lastMonitoring.average_weight || 0);
                 const currW = parseFormattedNumber(avgWeightInput.value);
                 weightGainInput.value = formatSmart(currW - lastW);
@@ -183,14 +180,11 @@
                 rationInput.value = formatSmart(ration);
             }
 
-            // Calcular en cada input los valores y formatear en blur
             [avgWeightInput, fishBalanceInput, biomassPercentageInput, rationNumberInput].forEach(input => {
                 input.classList.add('number-format');
 
                 input.addEventListener('input', () => {
                     calculateAll();
-
-                    // Ganancia peso sólo si no es el primer registro
                     if (!isFirstRecord && lastMonitoring && input.id === 'average_weight') {
                         const lastWeight = parseFloat(lastMonitoring.average_weight || 0);
                         const currentWeight = parseFormattedNumber(avgWeightInput.value);
@@ -200,13 +194,11 @@
                 });
 
                 input.addEventListener('blur', () => {
-                    // Formatear al perder foco
                     const num = parseFormattedNumber(input.value);
                     input.value = formatSmart(num);
                 });
             });
 
-            // Limpiar formato antes de enviar para enviar números puros
             document.getElementById('followup-form').addEventListener('submit', () => {
                 [avgWeightInput, fishBalanceInput, biomassPercentageInput, rationNumberInput].forEach(input => {
                     input.value = parseFormattedNumber(input.value);

@@ -8,7 +8,7 @@
 
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <form action="{{ route('observacion.store') }}" method="POST">
+                        <form action="{{ route('Tool.store') }}" method="POST">
                             @csrf
 
                             <!-- Campo Cantidad -->

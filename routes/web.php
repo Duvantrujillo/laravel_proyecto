@@ -6,7 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GruposPersonalController;
 use App\Http\Controllers\RegisterPersonalController;
 use App\Http\Controllers\EntradaSalidaPersonalController;
-use App\Http\Controllers\observationcontroller;
+use App\Http\Controllers\Toolcontroller;
 use App\Http\Controllers\GeoPondcontroller;
 use App\Http\Controllers\FeedRecordController;
 use App\Http\Controllers\MortalityController;
@@ -23,6 +23,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\WaterQualityController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GraficController;
+use App\Models\Tool;
 use Illuminate\Support\Facades\Log;
 
 /*
@@ -107,12 +108,12 @@ Route::middleware(['auth', 'role:admin,pasante'])->group(function () {
     Route::get('/obtener-fichas/{grupoId}', [EntradaSalidaPersonalController::class, 'obtenerFichas']);
 
     // Observaciones
-    Route::get('/observacion/create', [observationController::class, 'create'])->name('observacion.create');
-    Route::post('/observacion/store', [observationcontroller::class, 'store'])->name('observacion.store');
-    Route::get('/observacion/filtro', [observationController::class, 'index'])->name('observacion.index');
-    Route::delete('/observacion/{id}', [observationController::class, 'destroy'])->name('observacion.destroy');
-    Route::get('/observacion/{id}/edit', [observationcontroller::class, 'edit'])->name('observacion.editar');
-    Route::put('/observacion/{id}/edit', [observationcontroller::class, 'update'])->name('observacion.update');
+    Route::get('/Tool/create', [ToolController::class, 'create'])->name('Tool.create');
+    Route::post('/Tool/store', [ToolController::class, 'store'])->name('Tool.store');
+    Route::get('/Tool/filtro', [ToolController::class, 'index'])->name('Tool.index');
+    Route::delete('/Tool/{id}', [ToolController::class, 'destroy'])->name('Tool.destroy');
+    Route::get('/Tool/{id}/edit', [ToolController::class, 'edit'])->name('Tool.editar');
+    Route::put('/Tool/{id}/edit', [ToolController::class, 'update'])->name('Tool.update');
 
     // Geolocalización de Estanques
     Route::get('/geo-estanque/form', [GeoPondcontroller::class, 'create'])->name('geo.create');

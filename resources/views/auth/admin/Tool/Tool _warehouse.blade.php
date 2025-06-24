@@ -18,14 +18,14 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($observaciones as $obs)
+                @foreach ($tools as $obs)
                     <tr>
                         <td>{{ $obs->amount }}</td>
                         <td>{{ $obs->product }}</td>
                         <td>{{ $obs->observation }}</td>
                         @if (auth()->user()->role === 'admin')
                             <td class="text-center">
-                                <form method="POST" class="d-inline form-eliminar" data-id="{{ $obs->id }}" action="{{ route('observacion.destroy', $obs->id) }}">
+                                <form method="POST" class="d-inline form-eliminar" data-id="{{ $obs->id }}" action="{{ route('Tool.destroy', $obs->id) }}">
                                     @csrf
                                     @method('DELETE')
                                     <button type="button" class="btn btn-danger btn-sm btn-delete-swal" title="Eliminar">
@@ -46,7 +46,7 @@
 
 {{-- Modales solo para admin --}}
 @if (auth()->user()->role === 'admin')
-    @foreach ($observaciones as $obs)
+    @foreach ($tools as $obs)
         <div class="modal fade" id="modalEditar{{ $obs->id }}" tabindex="-1" role="dialog" aria-labelledby="modalEditarLabel{{ $obs->id }}" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content shadow">
@@ -57,7 +57,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form action="{{ route('observacion.update', $obs->id) }}" method="POST">
+                        <form action="{{ route('Tool.update', $obs->id) }}" method="POST">
                             @csrf
                             @method('PUT')
                             <input type="hidden" name="id" value="{{ $obs->id }}">
