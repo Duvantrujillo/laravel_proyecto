@@ -9,6 +9,7 @@
     <link rel="icon" href="{{ asset('images/Favicon2.png') }}" type="image/x-icon">
     <title>@yield('title', 'Panel de Administración')</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
     <!-- Fuentes de Google: Roboto -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap">

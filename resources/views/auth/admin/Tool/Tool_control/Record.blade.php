@@ -1,3 +1,4 @@
+
 @extends('layouts.master')
 
 @section('content')
@@ -145,23 +146,23 @@
                         </div>
                     </div>
                     <div class="card-body p-0">
-                        <div class="accordion" id="completedReturnsAccordion">
+                        <div class="custom-accordion" id="completedReturnsAccordion">
                             @php
                                 $groupedReturns = $completedReturns->sortByDesc('created_at')->groupBy('loan.requester_id');
                             @endphp
                             
-                            @forelse ($groupedReturns as $requesterId => $returns)
+                            @forelse ($groupedReturns as $requesterId => $groupReturns)
                                 @php
-                                    $firstReturn = $returns->first();
+                                    $firstReturn = $groupReturns->first();
                                     $personName = $firstReturn->loan->requester_name;
                                     $personId = $firstReturn->loan->requester_id;
-                                    $totalItems = $returns->count();
-                                    $totalToolsReturned = $returns->sum('quantity_returned');
+                                    $totalItems = $groupReturns->count();
+                                    $totalToolsReturned = $groupReturns->sum('quantity_returned');
                                 @endphp
                                 
                                 <div class="accordion-item border-0">
                                     <h2 class="accordion-header" id="heading{{ $requesterId }}">
-                                        <button class="accordion-button collapsed bg-gray-50 py-2 small" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $requesterId }}" aria-expanded="false" aria-controls="collapse{{ $requesterId }}">
+                                        <button class="custom-accordion-button bg-gray-50 py-2 small" type="button" data-target="collapse{{ $requesterId }}">
                                             <div class="d-flex justify-content-between w-100 pe-2">
                                                 <div>
                                                     <span class="fw-semibold">{{ $personName }}</span>
@@ -174,7 +175,7 @@
                                             </div>
                                         </button>
                                     </h2>
-                                    <div id="collapse{{ $requesterId }}" class="accordion-collapse collapse" aria-labelledby="heading{{ $requesterId }}" data-bs-parent="#completedReturnsAccordion">
+                                    <div id="collapse{{ $requesterId }}" class="custom-accordion-content">
                                         <div class="accordion-body p-0">
                                             <div class="table-responsive">
                                                 <table class="table table-sm table-hover mb-0">
@@ -192,7 +193,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        @foreach ($returns->sortByDesc('created_at') as $return)
+                                                        @foreach ($groupReturns->sortByDesc('created_at') as $return)
                                                             @php
                                                                 $loanDate = \Carbon\Carbon::parse($return->loan->loan_date);
                                                                 $returnDate = \Carbon\Carbon::parse($return->return_date);
@@ -277,7 +278,7 @@
                                             <td class="small {{ ($return->loan->quantity - $return->quantity_returned) > 0 ? 'text-danger' : 'text-success' }} fw-semibold">
                                                 {{ $return->loan->quantity - $return->quantity_returned }}
                                             </td>
-                                            <td class="small">{{ \Carbon\Carbon::parse($return->loan->loan_date)->format('d/m/Y ') }}</td>
+                                            <td class="small">{{ \Carbon\Carbon::parse($return->loan->loan_date)->format('d/m/Y') }}</td>
                                             <td class="small">{{ \Carbon\Carbon::parse($return->return_date)->format('d/m/Y') }}</td>
                                             <td class="small">{{ $return->loan->requester_name }}</td>
                                             <td class="small">{{ $return->loan->requester_id }}</td>
@@ -289,7 +290,7 @@
                                                 </span>
                                             </td>
                                             <td class="pe-3">
-                                                @if(($return->loan->quantity - $return->quantity_returned) === 0)
+                                                @if (($return->loan->quantity - $return->quantity_returned) === 0)
                                                     <span class="badge bg-success-soft text-success rounded-pill px-2 py-1 small">
                                                         <i class="bi bi-check2-all me-1"></i>{{ $return->return_status }}
                                                     </span>
@@ -314,188 +315,238 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Estilos personalizados mejorados -->
-    <style>
-        :root {
-            --bs-primary: #4e73df;
-            --bs-success: #1cc88a;
-            --bs-warning: #f6c23e;
-            --bs-secondary: #858796;
-            --bs-gray-100: #f8f9fc;
-            --bs-gray-200: #e3e6f0;
-            --bs-gray-600: #6e707e;
-            --bs-gray-800: #5a5c69;
+        <!-- Estilos personalizados mejorados -->
+        <style>
+            :root {
+                --bs-primary: #4e73df;
+                --bs-success: #1cc88a;
+                --bs-warning: #f6c23e;
+                --bs-secondary: #858796;
+                --bs-gray-100: #f8f9fc;
+                --bs-gray-200: #e3e6f0;
+                --bs-gray-600: #6e707e;
+                --bs-gray-800: #5a5c69;
+                
+                /* Colores suavizados */
+                --bs-primary-soft: #e8f0fe;
+                --bs-success-soft: #e6f7f0;
+                --bs-warning-soft: #fef6e6;
+                --bs-secondary-soft: #f0f1f3;
+                --bs-danger-soft: #fee2e2;
+            }
             
-            /* Colores suavizados */
-            --bs-primary-soft: #e8f0fe;
-            --bs-success-soft: #e6f7f0;
-            --bs-warning-soft: #fef6e6;
-            --bs-secondary-soft: #f0f1f3;
-            --bs-danger-soft: #fee2e2;
-        }
-        
-        body {
-            background-color: #f8fafc;
-            color: #4a5568;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 0.9rem;
-        }
-        
-        .card {
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-        
-        .card:hover {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .card-header {
-            transition: background-color 0.3s ease;
-            background-color: #f8fafc;
-        }
-        
-        .table {
-            --bs-table-striped-bg: #f9fafb;
-            font-size: 0.85rem;
-        }
-        
-        .table th {
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.5px;
-            color: #4a5568;
-        }
-        
-        .table-hover tbody tr:hover {
-            background-color: #f0f4f8;
-            transform: translateY(-1px);
-            transition: all 0.2s ease;
-        }
-        
-        .text-muted {
-            color: #718096 !important;
-        }
-        
-        .text-gray-800 {
-            color: #2d3748;
-        }
-        
-        .bg-gray-50 {
-            background-color: #f9fafb;
-        }
-        
-        .bg-gray-100 {
-            background-color: #f3f4f6;
-        }
-        
-        .badge {
-            font-weight: 500;
-            font-size: 0.75rem;
-        }
-        
-        .rounded-lg {
-            border-radius: 0.5rem;
-        }
-        
-        .accordion-button {
-            font-size: 0.85rem;
-            padding: 0.5rem 1rem;
-        }
-        
-        .accordion-button:not(.collapsed) {
-            background-color: #f3f4f6;
-            box-shadow: none;
-        }
-        
-        .accordion-button:focus {
-            box-shadow: none;
-            border-color: rgba(0,0,0,.125);
-        }
-        
-        .small {
-            font-size: 0.85rem;
-        }
-        
-        .h6 {
-            font-size: 1rem;
-        }
-        
-        /* Estilos mejorados para las pestañas */
-        .nav-tabs {
-            border-bottom: 2px solid #e2e8f0;
-        }
-        
-        .nav-tabs .nav-link {
-            color: #6b7280;
-            border: none;
-            border-bottom: 3px solid transparent;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            background-color: transparent;
-            margin-bottom: -2px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .nav-tabs .nav-link:hover {
-            color: #4e73df;
-            background-color: rgba(78, 115, 223, 0.05);
-            border-bottom-color: #e2e8f0;
-        }
-        
-        .nav-tabs .nav-link.active {
-            color: #4e73df;
-            background-color: transparent;
-            border-bottom: 3px solid #4e73df;
-        }
-        
-        .nav-tabs .nav-link.active i {
-            color: #4e73df;
-        }
-        
-        .nav-tabs .nav-link .badge {
-            font-size: 0.7rem;
-            padding: 0.25rem 0.5rem;
-            font-weight: 600;
-            margin-left: 0.5rem;
-        }
-        
-        /* Efecto hover más suave */
-        .nav-tabs .nav-link:not(.active):hover {
-            transform: translateY(-2px);
-        }
-        
-        /* Colores para los badges en pestañas */
-        .bg-primary-soft {
-            background-color: var(--bs-primary-soft);
-        }
-        
-        .bg-success-soft {
-            background-color: var(--bs-success-soft);
-        }
-        
-        .bg-secondary-soft {
-            background-color: var(--bs-secondary-soft);
-        }
-        
-        .bg-warning-soft {
-            background-color: var(--bs-warning-soft);
-        }
-        
-        .bg-danger-soft {
-            background-color: var(--bs-danger-soft);
-        }
-    </style>
+            body {
+                background-color: #f8fafc;
+                color: #4a5568;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-size: 0.9rem;
+            }
+            
+            .card {
+                border: 1px solid #e2e8f0;
+                transition: all 0.3s ease;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            }
+            
+            .card:hover {
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            
+            .card-header {
+                transition: background-color 0.3s ease;
+                background-color: #f8fafc;
+            }
+            
+            .table {
+                --bs-table-striped-bg: #f9fafb;
+                font-size: 0.85rem;
+            }
+            
+            .table th {
+                font-weight: 600;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                letter-spacing: 0.5px;
+                color: #4a5568;
+            }
+            
+            .table-hover tbody tr:hover {
+                background-color: #f0f4f8;
+                transform: translateY(-1px);
+                transition: all 0.2s ease;
+            }
+            
+            .text-muted {
+                color: #718096 !important;
+            }
+            
+            .text-gray-800 {
+                color: #2d3748;
+            }
+            
+            .bg-gray-50 {
+                background-color: #f9fafb;
+            }
+            
+            .bg-gray-100 {
+                background-color: #f3f4f6;
+            }
+            
+            .badge {
+                font-weight: 500;
+                font-size: 0.75rem;
+            }
+            
+            .rounded-lg {
+                border-radius: 0.5rem;
+            }
+            
+            .custom-accordion-button {
+                font-size: 0.85rem;
+                padding: 0.5rem 1rem;
+                width: 100%;
+                text-align: left;
+                background-color: #f9fafb;
+                border: none;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+            
+            .custom-accordion-button:hover {
+                background-color: #f0f4f8;
+            }
+            
+            .custom-accordion-button.active {
+                background-color: #f3f4f6;
+            }
+            
+            .custom-accordion-content {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+            }
+            
+            .custom-accordion-content.active {
+                max-height: 1000px; /* Ajusta según el contenido esperado */
+            }
+            
+            .small {
+                font-size: 0.85rem;
+            }
+            
+            .h6 {
+                font-size: 1rem;
+            }
+            
+            /* Estilos mejorados para las pestañas */
+            .nav-tabs {
+                border-bottom: 2px solid #e2e8f0;
+            }
+            
+            .nav-tabs .nav-link {
+                color: #6b7280;
+                border: none;
+                border-bottom: 3px solid transparent;
+                padding: 0.75rem 1.5rem;
+                font-weight: 600;
+                font-size: 0.9rem;
+                transition: all 0.3s ease;
+                background-color: transparent;
+                margin-bottom: -2px;
+                display: flex;
+                align-items: center;
+            }
+            
+            .nav-tabs .nav-link:hover {
+                color: #4e73df;
+                background-color: rgba(78, 115, 223, 0.05);
+                border-bottom-color: #e2e8f0;
+            }
+            
+            .nav-tabs .nav-link.active {
+                color: #4e73df;
+                background-color: transparent;
+                border-bottom: 3px solid #4e73df;
+            }
+            
+            .nav-tabs .nav-link.active i {
+                color: #4e73df;
+            }
+            
+            .nav-tabs .nav-link .badge {
+                font-size: 0.7rem;
+                padding: 0.25rem 0.5rem;
+                font-weight: 600;
+                margin-left: 0.5rem;
+            }
+            
+            .nav-tabs .nav-link:not(.active):hover {
+                transform: translateY(-2px);
+            }
+            
+            /* Colores para los badges en pestañas */
+            .bg-primary-soft {
+                background-color: var(--bs-primary-soft);
+            }
+            
+            .bg-success-soft {
+                background-color: var(--bs-success-soft);
+            }
+            
+            .bg-secondary-soft {
+                background-color: var(--bs-secondary-soft);
+            }
+            
+            .bg-warning-soft {
+                background-color: var(--bs-warning-soft);
+            }
+            
+            .bg-danger-soft {
+                background-color: var(--bs-danger-soft);
+            }
+        </style>
 
-    <!-- Include Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Include Bootstrap JS for accordion functionality -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Include Bootstrap Icons -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <!-- Include Bootstrap JS for tabs and alerts (not accordion) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Script personalizado para el acordeón -->
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const accordionButtons = document.querySelectorAll('.custom-accordion-button');
+                
+                accordionButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const targetId = button.getAttribute('data-target');
+                        const content = document.getElementById(targetId);
+                        const isActive = content.classList.contains('active');
+                        
+                        // Cerrar todos los paneles
+                        document.querySelectorAll('.custom-accordion-content').forEach(content => {
+                            content.classList.remove('active');
+                            content.style.maxHeight = '0';
+                        });
+                        document.querySelectorAll('.custom-accordion-button').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        
+                        // Abrir el panel seleccionado si no estaba activo
+                        if (!isActive) {
+                            content.classList.add('active');
+                            content.style.maxHeight = content.scrollHeight + 'px';
+                            button.classList.add('active');
+                            console.log('Accordion opened:', targetId);
+                        } else {
+                            console.log('Accordion closed:', targetId);
+                        }
+                    });
+                });
+                
+                // Depuración adicional
+                console.log('Accordion initialized with', accordionButtons.length, 'items');
+            });
+        </script>
+    </div>
 @endsection

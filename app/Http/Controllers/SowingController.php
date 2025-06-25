@@ -6,6 +6,7 @@ use App\Models\pond_unit_code;
 use App\Models\Sowing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+ use Barryvdh\DomPDF\Facade\Pdf; // Asegúrate de tener barryvdh/laravel-dompdf instalado
 use Illuminate\Database\QueryException; // <-- Import necesario
 
 class SowingController extends Controller
@@ -140,4 +141,40 @@ class SowingController extends Controller
 
         return response()->json($identifiers);
     }
+
+
+   
+
+public function exportPDF($id)
+{
+    $sowing = Sowing::with([
+        'pond',
+        'identifier',
+        'type.species',
+        'dietMonitorings.feedRecords',
+        'mortalities',
+        'waterQualities'
+    ])->findOrFail($id);
+
+    // Formatear valores numéricos antes de enviarlos al PDF
+    foreach ($sowing->dietMonitorings as $dm) {
+        $dm->average_weight = $this->formatNumber($dm->average_weight);
+        $dm->biomass = $this->formatNumber($dm->biomass);
+        $dm->biomass_percentage = $this->formatNumber($dm->biomass_percentage);
+        $dm->daily_feed = $this->formatNumber($dm->daily_feed);
+        $dm->ration = $this->formatNumber($dm->ration);
+        $dm->weight_gain = $this->formatNumber($dm->weight_gain);
+        $dm->cumulative_mortality = $this->formatNumber($dm->cumulative_mortality);
+    }
+
+    $pdf = Pdf::loadView('pdf.sowing_summary.sowing_summary', compact('sowing'));
+    return $pdf->download('Siembra_' . $sowing->id . '.pdf');
+}
+
+// Función auxiliar para formatear números como 10.0 => 10, 10.1 => 10.1
+private function formatNumber($value)
+{
+    return rtrim(rtrim(number_format((float) $value, 2, '.', ''), '0'), '.');
+}
+
 }

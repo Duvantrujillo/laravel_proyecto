@@ -133,6 +133,14 @@ Route::middleware(['auth', 'role:admin,pasante'])->group(function () {
     Route::get('/get-ponds-by-pond-id', [MortalityController::class, 'getPondsByPondId'])->name('mortality.getPondsByPondId');
     Route::get('/mortality/get-ponds', [MortalityController::class, 'index'])->name('mortality.index');
     Route::get('/mortality/get-sowing-data', [MortalityController::class, 'getSowingData'])->name('mortality.getSowingData');
+    Route::get('/mortality/history/{sowing}', [MortalityController::class, 'history'])->name('mortality.history');
+    Route::get('/mortality/pdf/estanque/{pond_unit_code_id}', [MortalityController::class, 'pdfEstanque'])->name('mortality.pdf.estanque');
+    Route::get('/mortality/pdf/quincena/{pond_unit_code_id}/{quincena}', [MortalityController::class, 'pdfQuincena'])->name('mortality.pdf.quincena');
+    Route::get('mortality/{id}/edit', [MortalityController::class, 'edit'])->name('mortality.edit');
+    Route::delete('mortality/{id}', [MortalityController::class, 'destroy'])->name('mortality.destroy');
+    Route::put('mortality/{id}', [MortalityController::class, 'update'])->name('mortality.update');
+
+
 
     // Especies y Tipos
     Route::get('/species', [SpeciesController::class, 'index'])->name('species.index');
@@ -160,6 +168,8 @@ Route::middleware(['auth', 'role:admin,pasante'])->group(function () {
     Route::get('/sowing/{sowing}/diet-monitoring', [DietMonitoringController::class, 'showBySowing'])->name('sowing.diet_monitoring');
     Route::post('/sowing/{id}/finish', [DietMonitoringController::class, 'finish'])->name('sowing.finish');
     Route::get('/seguimientos/terminados', [DietMonitoringController::class, 'terminated'])->name('diet_monitoring.terminated');
+    Route::get('/sowing/{id}/export-pdf', [SowingController::class, 'exportPDF'])->name('sowing.export.pdf');
+
 
     // Préstamos y devoluciones
     Route::resource('loans', LoanController::class);

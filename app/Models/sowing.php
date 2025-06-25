@@ -62,4 +62,8 @@ public function feedRecords()
     {
         return $this->hasOne(DietMonitoring::class)->latestOfMany();
     }
+      public function waterQualities()
+    {
+        return $this->hasMany(WaterQuality::class, 'sowing_id');
+    }
 }
