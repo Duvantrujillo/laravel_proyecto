@@ -129,7 +129,7 @@
                         success: function(response) {
                             if (response.exists) {
                                 nombreGrupoError.text(
-                                    'Este nombre de grupo ya está registrado.').removeClass(
+                                    'El nombre que ha ingresado para el Tecnólogo ya existe en el sistema. Por favor, utilice uno diferente.').removeClass(
                                     'd-none');
                                 nombreGrupoInput.addClass('is-invalid');
                                 isNombreGrupoValid = false;
