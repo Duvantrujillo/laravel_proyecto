@@ -26,9 +26,15 @@ class TypeController extends Controller
     return redirect()->route('types.create')->with('success', 'Tipo creado exitosamente.');
 }
 
-    public function destroy(Type $type)
-    {
-        $type->delete();
-        return redirect()->route('species.index')->with('success', 'Tipo eliminado exitosamente.');
+  public function destroy(Type $type)
+{
+    // Ejemplo: validar que no tenga relaciones (si quieres)
+    if ($type->sowings()->count() > 0) {
+        return redirect()->route('species.index')->with('error', 'No se puede eliminar este tipo porque tiene siembras asociadas.');
     }
+
+    $type->delete();
+    return redirect()->route('species.index')->with('success', 'Tipo eliminado exitosamente.');
+}
+
 }

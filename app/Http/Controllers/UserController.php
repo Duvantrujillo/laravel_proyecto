@@ -147,10 +147,29 @@ class UserController extends Controller
 
     // Eliminar usuario
     public function destroy($id)
-    {
+{
+    try {
         $user = User::findOrFail($id);
+
+        // Verificar relaciones
+        if (
+            $user->waterQualities()->exists() ||
+            $user->feedRecords()->exists() ||
+            $user->loansDelivered()->exists()
+        ) {
+            return redirect()->route('users.index')
+                ->with('error', '❌ No se puede eliminar este usuario porque tiene registros asociados.');
+        }
+
         $user->delete();
 
-        return redirect()->route('users.index')->with('success', 'Usuario eliminado correctamente.');
+        return redirect()->route('users.index')
+            ->with('success', '✅ Usuario eliminado correctamente.');
+    } catch (\Exception $e) {
+        \Log::error('Error al eliminar usuario: ' . $e->getMessage());
+        return redirect()->route('users.index')
+            ->with('error', '❌ Error al intentar eliminar el usuario.');
     }
+}
+
 }

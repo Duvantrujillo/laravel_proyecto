@@ -79,7 +79,7 @@
                         <form action="{{ route('login') }}" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label for="email" class="form-label">Usuario</label>
+                                <label for="email" class="form-label">Correo</label>
                                 <input id="email" type="email" class="form-control" name="email" required placeholder="Ingrese su correo" value="{{ old('email') }}" />
                             </div>
 
@@ -88,12 +88,6 @@
                                 <input id="password" type="password" class="form-control" name="password" required placeholder="Ingrese su contraseña" />
                             </div>
 
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }} />
-                                    <label class="form-check-label" for="remember">Recuérdame</label>
-                                </div>
-                            </div>
 
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary">Ingresar</button>

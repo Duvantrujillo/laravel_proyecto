@@ -30,6 +30,30 @@
         </script>
     @endif
 
+    {{-- Aquí agrego tu alert de error igual, sin modificar nada --}}
+    @if (session('error'))
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let error = @json(session('error'));
+                let htmlContent = '';
+
+                if (typeof error === 'object') {
+                    htmlContent += error.message ? error.message + '<br>' : '';
+                } else {
+                    htmlContent = error;
+                }
+
+                Swal.fire({
+                    title: '¡Error!',
+                    html: htmlContent,
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            });
+        </script>
+    @endif
+
     <!-- Filtro de búsqueda -->
     <form method="GET" action="{{ route('users.index') }}" class="mb-4">
         <div class="row g-3 align-items-center">

@@ -21,4 +21,10 @@ class register_personal extends Model
     {
         return $this->belongsTo(Ficha::class, 'fichas');
     }
+
+    public function entradasSalidas()
+{
+    return $this->hasMany(entrada_salida_personal::class, 'nombre');
+}
+
 }

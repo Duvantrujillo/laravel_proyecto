@@ -140,15 +140,32 @@ class RegisterPersonalController extends Controller
         return redirect()->back()->with('success', 'Información actualizada con éxito.');
     }
 
-    public function destroy($id)
-    {
-        try {
-            $persona = register_personal::findOrFail($id);
-            $persona->delete();
-            return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            Log::error("Error al eliminar: " . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'No se pudo eliminar el registro.']);
+public function destroy($id)
+{
+    try {
+        $persona = register_personal::findOrFail($id);
+
+        // Validar si tiene registros en entrada_salida_personal
+        if ($persona->entradasSalidas()->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => '❌ No se puede eliminar porque tiene registros de ingreso/salida asociados.'
+            ]);
         }
+
+        // Puede tener ficha o grupo, pero aún se permite eliminar
+        $persona->delete();
+
+        return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+        \Log::error("Error al eliminar: " . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Ocurrió un error al intentar eliminar el registro.'
+        ]);
     }
+}
+
+
+
 }

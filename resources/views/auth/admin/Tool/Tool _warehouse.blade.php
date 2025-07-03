@@ -130,6 +130,21 @@
     </script>
 @endif
 
+{{-- ✅ NUEVA ALERTA DE ERROR POR RELACIONES --}}
+@if (session('error'))
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                title: '¡Error!',
+                html: @json(session('error')),
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+        });
+    </script>
+@endif
+
 @if (auth()->user()->role === 'admin')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>

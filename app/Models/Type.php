@@ -20,4 +20,8 @@ class Type extends Model
     {
         $this->attributes['name'] = Str::upper($value); // Converts to uppercase
     }
+    public function sowings()
+{
+    return $this->hasMany(Sowing::class, 'type_id');
+}
 }

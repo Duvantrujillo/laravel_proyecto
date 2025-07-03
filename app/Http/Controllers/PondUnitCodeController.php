@@ -107,12 +107,21 @@ class PondUnitCodeController extends Controller
 
 
     // Eliminar identificador
-    public function destroy($id)
-    {
-        $identificador = pond_unit_code::findOrFail($id);
-        $identificador->delete();
-        return redirect()->route('geo.index')->with('success', 'Identificador eliminado.');
+   public function destroy($id)
+{
+    $identificador = pond_unit_code::findOrFail($id);
+
+    // Verifica si tiene siembras asociadas
+    if ($identificador->sowings()->exists()) {
+        return redirect()->route('geo.index')
+            ->with('error', '❌ No se puede eliminar el identificador porque tiene siembras asociadas.');
     }
+
+    $identificador->delete();
+
+    return redirect()->route('geo.index')->with('success', '✅ Identificador eliminado correctamente.');
+}
+
 
     // Mostrar formulario para editar el nombre del estanque
     public function editEstanque($pond_id)
@@ -139,18 +148,23 @@ class PondUnitCodeController extends Controller
 
 }
 
-
-    public function deleteEstanque($pond_id)
+public function deleteEstanque($pond_id)
 {
     $pond = GeoPond::findOrFail($pond_id);
-    
-    // Borra primero los identificadores asociados
-    pond_unit_code::where('pond_id', $pond_id)->delete();
-    
-    // Luego borra el estanque
+
+    // Verificar si tiene identificadores asociados
+    if ($pond->identificadores()->exists()) {
+        return redirect()->route('geo.index')
+            ->with('error', '❌ No se puede eliminar el estanque porque tiene identificadores asociados.');
+    }
+
+    // Si no tiene identificadores, se elimina
     $pond->delete();
 
-    return redirect()->route('geo.index')->with('success', 'Estanque eliminado con sus identificadores.');
+    return redirect()->route('geo.index')
+        ->with('success', '✅ Estanque eliminado correctamente.');
 }
+
+
 
 }

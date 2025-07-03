@@ -164,4 +164,30 @@
     });
 </script>
 @endif
+
+@if (session('error'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            title: '¡Error!',
+            html: {!! json_encode(session('error')) !!},
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
+    });
+</script>
+@endif
+
+@if (session('success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            title: '¡Éxito!',
+            html: {!! json_encode(session('success')) !!},
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+        });
+    });
+</script>
+@endif
 @endsection

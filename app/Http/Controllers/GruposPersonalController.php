@@ -93,7 +93,7 @@ class GruposPersonalController extends Controller
         $grupo->nombre = strtoupper($request->nombre);
         $grupo->save();
 
-        return redirect()->route('grupo.create')->with('success', 'Tecnólogo actualizado con éxito');
+        return redirect()->route('grupos-fichas.index')->with('success', 'Tecnólogo actualizado con éxito');
     }
 
     // Mostrar formulario para editar ficha
@@ -126,7 +126,7 @@ class GruposPersonalController extends Controller
         $ficha->grupo_id = $request->grupo_id;
         $ficha->save();
 
-        return redirect()->route('grupo.create')->with('success', 'Ficha actualizada con éxito');
+        return redirect()->route('grupos-fichas.index')->with('success', 'Ficha actualizada con éxito');
     }
 
 
@@ -135,23 +135,36 @@ class GruposPersonalController extends Controller
 public function destroyFicha($id)
 {
     $ficha = Ficha::findOrFail($id);
+
+    // Verificar si hay personas asociadas a esta ficha
+    $registros = \App\Models\register_personal::where('fichas', $ficha->id)->exists();
+
+    if ($registros) {
+        return redirect()->route('grupos-fichas.index')->with('error', 'No se puede eliminar la ficha porque tiene registros asociados.');
+    }
+
+    // Si no hay registros asociados, eliminar la ficha
     $ficha->delete();
 
-    return redirect()->route('grupo.create')->with('success', 'Ficha eliminada con éxito');
+    return redirect()->route('grupos-fichas.index')->with('success', 'Ficha eliminada con éxito.');
 }
+
 
 // Eliminar grupo con todas sus fichas
 public function destroyGrupo($id)
 {
     $grupo = grupos_personal::findOrFail($id);
 
-    // Eliminar todas las fichas asociadas
-    $grupo->fichas()->delete();
+    // Verificar si el grupo tiene fichas asociadas
+    if ($grupo->fichas()->exists()) {
+        return redirect()->route('grupos-fichas.index')->with('error', '❌ No se puede eliminar el grupo porque tiene fichas asociadas.');
+    }
 
-    // Eliminar el grupo
+    // Si no tiene fichas, se elimina
     $grupo->delete();
 
-    return redirect()->route('grupo.create')->with('success', 'Grupo y sus fichas eliminados con éxito');
+    return redirect()->route('grupos-fichas.index')->with('success', '✅ Grupo eliminado con éxito');
 }
+
 
 }

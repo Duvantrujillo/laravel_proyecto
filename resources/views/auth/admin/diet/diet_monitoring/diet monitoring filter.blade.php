@@ -1,25 +1,6 @@
 @extends('layouts.master')
 
 @section('content')
-@php
-function formatNumberCol($number) {
-    if ($number === null) return '-';
-
-    // Si el número es entero, muéstralo sin decimales
-    if (floor($number) == $number) {
-        return number_format($number, 0, ',', '.');
-    }
-
-    // Si tiene 1 decimal exacto, muéstralo con 1 decimal
-    if (round($number, 1) == $number) {
-        return number_format($number, 1, ',', '.');
-    }
-
-    // Si tiene más decimales, muestra 2 (no se pierde la parte decimal)
-    return number_format($number, 2, ',', '.');
-}
-@endphp
-
 
 <div class="container mt-4">
     <div class="card border-light shadow-sm">
@@ -99,37 +80,37 @@ function formatNumberCol($number) {
         border-color: var(--dark-teal);
         color: var(--dark-teal);
     }
-    
+
     .compact-table th { 
         font-weight: 500;
         font-size: 0.9rem;
         padding: 0.75rem;
     }
-    
+
     .compact-table td {
         padding: 0.6rem;
         font-size: 0.9rem;
     }
-    
+
     .hover-row:hover {
         background-color: #f8fafb;
     }
-    
+
     .mortality-indicator {
         padding: 2px 8px;
         border-radius: 12px;
     }
-    
+
     .mortality-indicator.low {
         background-color: #e8f5e9;
         color: #2e7d32;
     }
-    
+
     .mortality-indicator.high {
         background-color: #ffebee;
         color: #c62828;
     }
-    
+
     .badge.bg-soft-teal {
         padding: 0.35em 0.65em;
         font-weight: 400;

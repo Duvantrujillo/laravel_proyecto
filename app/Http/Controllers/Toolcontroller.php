@@ -69,11 +69,26 @@ class ToolController extends Controller
         return redirect()->route('Tool.index')->with('correcto', 'La herramienta fue actualizada correctamente');
     }
 
-    public function destroy($id)
-    {
+public function destroy($id)
+{
+    try {
         $tool = Tool::findOrFail($id);
+
+        // Validar si tiene préstamos asociados
+        if ($tool->loans()->exists()) {
+            return redirect()->route('Tool.index')
+                ->with('error', '❌ No se puede eliminar la herramienta porque tiene préstamos registrados.');
+        }
+
         $tool->delete();
 
-        return redirect()->route('Tool.index')->with('eliminada', 'Herramienta eliminada correctamente');
+        return redirect()->route('Tool.index')
+            ->with('eliminada', '✅ Herramienta eliminada correctamente');
+    } catch (\Exception $e) {
+        \Log::error('Error al eliminar herramienta: ' . $e->getMessage());
+        return redirect()->route('Tool.index')
+            ->with('error', '❌ Ocurrió un error al intentar eliminar la herramienta.');
     }
+}
+
 }

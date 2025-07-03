@@ -41,4 +41,20 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function waterQualities()
+{
+    return $this->hasMany(WaterQuality::class, 'user_id');
+}
+
+public function feedRecords()
+{
+    return $this->hasMany(FeedRecord::class, 'responsible_id');
+}
+
+public function loansDelivered()
+{
+    return $this->hasMany(Loan::class, 'delivered_by');
+}
+
 }

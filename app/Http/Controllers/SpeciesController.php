@@ -68,9 +68,17 @@ class SpeciesController extends Controller
         Type::create($request->all());
         return redirect()->route('species.index')->with('success', 'tipo creado exitosamente.');
     }
-    public function destroy(Species $species)
-    {
-        $species->delete();
-        return redirect()->route('species.index')->with('success', 'especie eliminada exitosamente.');
+public function destroy(Species $species)
+{
+    // Verificar si tiene tipos asociados
+    if ($species->types()->exists()) {
+        return redirect()->route('species.index')
+            ->with('error', '❌ No se puede eliminar la especie porque tiene tipos asociados.');
     }
+
+    $species->delete();
+
+    return redirect()->route('species.index')->with('success', '✅ Especie eliminada exitosamente.');
+}
+
 }

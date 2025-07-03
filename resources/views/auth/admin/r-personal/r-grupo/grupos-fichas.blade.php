@@ -156,4 +156,22 @@
         });
     });
 </script>
+
+@if (session('success'))
+    <script>
+        Swal.fire({
+            title: "{{ session('success') }}",
+            icon: "success"
+        });
+    </script>
+@endif
+
+@if (session('error'))
+    <script>
+        Swal.fire({
+            title: "{{ session('error') }}",
+            icon: "error"
+        });
+    </script>
+@endif
 @endsection

@@ -173,12 +173,25 @@
     </script>
 
     {{-- Alertas --}}
+
     @if (session('success'))
         <script>
             Swal.fire({
                 title: '¡Éxito!',
                 text: '{{ session('success') }}',
                 icon: 'success',
+                confirmButtonText: 'Aceptar'
+            });
+        </script>
+    @endif
+
+    {{-- Alertas para errores --}}
+    @if (session('error'))
+        <script>
+            Swal.fire({
+                title: 'Error',
+                text: '{{ session('error') }}',
+                icon: 'error',
                 confirmButtonText: 'Aceptar'
             });
         </script>
@@ -194,5 +207,6 @@
             });
         </script>
     @endif
+
 </section>
 @endsection
