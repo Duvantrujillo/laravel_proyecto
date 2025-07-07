@@ -138,37 +138,41 @@
 <div class="sowing-container">
     <h2>Siembras con estado 'inicializada'</h2>
 
-    @php use App\Models\Mortality; @endphp
+    @php
+        use App\Models\Mortality;
+
+        if (!function_exists('formatNumber')) {
+            function formatNumber($value) {
+                if (is_null($value)) return 'No disponible';
+                return fmod($value, 1) == 0
+                    ? number_format($value, 0, ',', '.')
+                    : number_format($value, 2, ',', '.');
+            }
+        }
+    @endphp
 
     @foreach ($sowings as $sowing)
     @php
-    $lastMonitoring = $sowing->dietMonitorings->sortByDesc('created_at')->first();
-    $lastMonitoringDate = $lastMonitoring ? $lastMonitoring->created_at : null;
+        $lastMonitoring = $sowing->dietMonitorings->sortByDesc('created_at')->first();
+        $lastMonitoringDate = $lastMonitoring ? $lastMonitoring->created_at : null;
 
-    $mortalityCount = Mortality::where('pond_code_id', $sowing->identifier_id)
-    ->where('sowing_id', $sowing->id)
-    ->when($lastMonitoringDate, function ($query) use ($lastMonitoringDate) {
-    $query->where('created_at', '>', $lastMonitoringDate);
-    })
-    ->count();
+        $mortalityCount = Mortality::where('pond_code_id', $sowing->identifier_id)
+            ->where('sowing_id', $sowing->id)
+            ->when($lastMonitoringDate, function ($query) use ($lastMonitoringDate) {
+                $query->where('created_at', '>', $lastMonitoringDate);
+            })
+            ->count();
 
-    $isFirst = $sowing->dietMonitorings->isEmpty();
-    $canRegisterFollowUp = $isFirst || $mortalityCount >= 15;
-    $canRegisterFeedRecord = !$isFirst;
+        $isFirst = $sowing->dietMonitorings->isEmpty();
+        $canRegisterFollowUp = $isFirst || $mortalityCount >= 15;
+        $canRegisterFeedRecord = !$isFirst;
 
-    function formatNumber($value) {
-    if (is_null($value)) return 'No disponible';
-    return fmod($value, 1) == 0
-    ? number_format($value, 0, ',', '.')
-    : number_format($value, 2, ',', '.');
-    }
+        $monitoringCount = $sowing->dietMonitorings->count();
+        $feedRecordsCount = $lastMonitoring ? $lastMonitoring->feedRecords()->count() : 0;
+        $registroAlimentacionHabilitado = $monitoringCount >= 1 && $feedRecordsCount < 15;
+    @endphp
 
-    $monitoringCount = $sowing->dietMonitorings->count();
-    $feedRecordsCount = $lastMonitoring ? $lastMonitoring->feedRecords()->count() : 0;
-    $registroAlimentacionHabilitado = $monitoringCount >= 1 && $feedRecordsCount < 15;
-        @endphp
-
-        <div class="accordion-item">
+    <div class="accordion-item">
         <div class="accordion-header">
             <div>
                 <div class="accordion-title">Siembra del {{ $sowing->sowing_date }}</div>
@@ -267,8 +271,8 @@
             @endauth
 
         </div>
-</div>
-@endforeach
+    </div>
+    @endforeach
 </div>
 
 <!-- Scripts -->

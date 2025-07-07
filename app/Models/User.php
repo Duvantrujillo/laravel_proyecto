@@ -56,5 +56,9 @@ public function loansDelivered()
 {
     return $this->hasMany(Loan::class, 'delivered_by');
 }
+public function assignedSowings()
+{
+    return $this->belongsToMany(Sowing::class, 'assigned_sowings');
+}
 
 }

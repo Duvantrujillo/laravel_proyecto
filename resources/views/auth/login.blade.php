@@ -65,7 +65,7 @@
             <div class="col-md-5">
                 <div class="card login-card shadow-lg border-0 p-1">
                     <img src="{{ asset('login_img/logo_sena.jpg') }}" alt="Logo SENA" width="100" class="mx-auto d-block" />
-                    <div class="welcome-title">¡Bienvenido a Codenest!</div>
+                    <div class="welcome-title">¡Bienvenido a Acuinet!</div>
 
                     <!-- Alertas bootstrap para mensajes de sesión (opcional) -->
                     @if (session('status'))

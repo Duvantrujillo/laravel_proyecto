@@ -11,6 +11,7 @@ use App\Models\Mortality;
 
 use App\Models\pond_unit_code;
 
+
 class DietMonitoringController extends Controller
 {
     // Función para limpiar y convertir números formateados es-CO a float
@@ -23,11 +24,19 @@ class DietMonitoringController extends Controller
         return floatval($number);
     }
 
-    public function create()
-    {
+  public function create()
+{
+    if (auth()->user()->role === 'admin') {
+        // Admin ve todas las siembras inicializadas
         $sowings = Sowing::where('state', 'inicializada')->get();
-        return view('auth.admin.diet.diet_monitoring.Form', compact('sowings'));
+    } else {
+        // Pasante solo ve las asignadas e inicializadas
+        $sowings = auth()->user()->assignedSowings()->where('state', 'inicializada')->get();
     }
+
+    return view('auth.admin.diet.diet_monitoring.Form', compact('sowings'));
+}
+
 
     public function index(Request $request, $sowing_id)
     {

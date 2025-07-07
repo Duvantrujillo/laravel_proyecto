@@ -9,7 +9,7 @@
     <link rel="icon" href="{{ asset('images/Favicon2.png') }}" type="image/x-icon">
     <title>@yield('title', 'Panel de Administración')</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
     <!-- Fuentes de Google: Roboto -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap">
@@ -22,7 +22,7 @@
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <!-- Estilos personalizados -->
-     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 
     @yield('styles')
     <style>
@@ -344,25 +344,25 @@
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
-               
+
                 <li class="nav-item dropdown">
                     <a class="nav-link user-menu" href="#" id="navbarDropdown" data-toggle="dropdown"
                         aria-expanded="false">
                         <i class="fas fa-user-circle mr-1"></i>
                         @if (Auth::check())
-                        <span>{{ Auth::user()->name }}</span>
+                            <span>{{ Auth::user()->name }}</span>
                         @else
-                        <script>
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Sesión expirada',
-                                text: 'Tu sesión ha expirado. Serás redirigido al login.',
-                                showConfirmButton: false,
-                                timer: 3000
-                            }).then(() => {
-                                window.location.href = "{{ route('login') }}";
-                            });
-                        </script>
+                            <script>
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Sesión expirada',
+                                    text: 'Tu sesión ha expirado. Serás redirigido al login.',
+                                    showConfirmButton: false,
+                                    timer: 3000
+                                }).then(() => {
+                                    window.location.href = "{{ route('login') }}";
+                                });
+                            </script>
                         @endif
 
                     </a>
@@ -381,15 +381,15 @@
 
         <!-- Sidebar -->
         <aside class="main-sidebar sidebar-light-primary elevation-4">
-           <a href="#" class="brand-link animate__animated animate__fadeInLeft d-flex align-items-center">
-    <i class="fas fa-fish brand-image me-2" style="color: #3498db;"></i>
+            <a href="#" class="brand-link animate__animated animate__fadeInLeft d-flex align-items-center">
+                <i class="fas fa-fish brand-image me-2" style="color: #3498db;"></i>
 
-    @php
-        $rol = Auth::check() ? ucfirst(Auth::user()->role) : 'Invitado';
-    @endphp
+                @php
+                    $rol = Auth::check() ? ucfirst(Auth::user()->role) : 'Invitado';
+                @endphp
 
-    <span class="brand-text">{{ $rol }}</span>
-</a>
+                <span class="brand-text">{{ $rol }}</span>
+            </a>
 
             <div class="sidebar">
                 <nav class="mt-3">
@@ -404,14 +404,14 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 @auth
-                                @if (auth()->user()->role === 'admin')
-                                <li class="nav-item">
-                                    <a href="{{ route('grupo.create') }}" class="nav-link">
-                                        <i class="nav-icon fas fa-plus-circle"></i>
-                                        <p>Nuevo Tecnólogo/Ficha</p>
-                                    </a>
-                                </li>
-                                @endif
+                                    @if (auth()->user()->role === 'admin')
+                                        <li class="nav-item">
+                                            <a href="{{ route('grupo.create') }}" class="nav-link">
+                                                <i class="nav-icon fas fa-plus-circle"></i>
+                                                <p>Nuevo Tecnólogo/Ficha</p>
+                                            </a>
+                                        </li>
+                                    @endif
                                 @endauth
 
                                 <li class="nav-item">
@@ -448,29 +448,29 @@
 
                         <!-- Gestión de Pasantes -->
                         @auth
-                        @if (auth()->user()->role === 'admin')
-                        <li class="nav-header">Pasantes</li>
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon fas fa-user-tie"></i>
-                                <p>Pasantes <i class="fas fa-angle-left right"></i></p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ route('users.create') }}" class="nav-link">
-                                        <i class="nav-icon fas fa-user-plus"></i>
-                                        <p>Registrar Pasante</p>
+                            @if (auth()->user()->role === 'admin')
+                                <li class="nav-header">Pasantes</li>
+                                <li class="nav-item has-treeview">
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon fas fa-user-tie"></i>
+                                        <p>Pasantes <i class="fas fa-angle-left right"></i></p>
                                     </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="{{ route('users.create') }}" class="nav-link">
+                                                <i class="nav-icon fas fa-user-plus"></i>
+                                                <p>Registrar Pasante</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('users.index') }}" class="nav-link">
+                                                <i class="nav-icon fas fa-search"></i>
+                                                <p>Pasantes Registrados</p>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('users.index') }}" class="nav-link">
-                                        <i class="nav-icon fas fa-search"></i>
-                                        <p>Pasantes Registrados</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        @endif
+                            @endif
                         @endauth
 
 
@@ -512,15 +512,15 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 @auth
-                                @if (auth()->user()->role === 'admin')
-                                <!-- Esto solo lo verá el administrador -->
-                                <li class="nav-item">
-                                    <a href="{{ route('Tool.create') }}" class="nav-link">
-                                        <i class="nav-icon fas fa-plus-square"></i>
-                                        <p>Registrar Herramienta</p>
-                                    </a>
-                                </li>
-                                @endif
+                                    @if (auth()->user()->role === 'admin')
+                                        <!-- Esto solo lo verá el administrador -->
+                                        <li class="nav-item">
+                                            <a href="{{ route('Tool.create') }}" class="nav-link">
+                                                <i class="nav-icon fas fa-plus-square"></i>
+                                                <p>Registrar Herramienta</p>
+                                            </a>
+                                        </li>
+                                    @endif
                                 @endauth
 
                                 <li class="nav-item">
@@ -587,12 +587,17 @@
                                 <p>Dietas <i class="fas fa-angle-left right"></i></p>
                             </a>
                             <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="{{ route('siembras.create') }}" class="nav-link">
-                                        <i class="nav-icon fas fa-file-alt"></i>
-                                        <p>Encabezado Dieta</p>
-                                    </a>
-                                </li>
+                                @auth
+                                    @if (auth()->user()->role === 'admin')
+                                        <li class="nav-item">
+                                            <a href="{{ route('siembras.create') }}" class="nav-link">
+                                                <i class="nav-icon fas fa-file-alt"></i>
+                                                <p>Encabezado Dieta</p>
+                                            </a>
+                                        </li>
+                                    @endif
+                                @endauth
+
                                 <li class="nav-item">
                                     <a href="{{ route('diet_monitoring.create') }}" class="nav-link">
                                         <i class="nav-icon fas fa-clipboard-list"></i>
@@ -615,11 +620,22 @@
                                 <i class="nav-icon fas fa-user-friends"></i>
                                 <p>Invitados</p>
                             </a>
-                          <a href="{{ route('sowing.dashboard') }}" class="nav-link">
-    <i class="nav-icon fas fa-chart-bar"></i>
-    <p>Gráficas</p>
-</a>
-
+                            @auth
+                                @if (auth()->user()->role === 'admin')
+                                    <a href="{{ route('sowing.dashboard') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-chart-bar"></i>
+                                        <p>Gráficas</p>
+                                    </a>
+                                @endif
+                            @endauth
+                            @auth
+                                @if (auth()->user()->role === 'admin')
+                                    <a href="{{ route('assigned_sowings.index') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-fish"></i>
+                                        <p>Cosechas Asignada</p>
+                                    </a>
+                                @endif
+                            @endauth
                         </li>
                     </ul>
                 </nav>
@@ -702,7 +718,7 @@
         });
     </script>
     @yield('scripts')
-  
+
 
 </body>
 

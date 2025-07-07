@@ -66,4 +66,9 @@ public function feedRecords()
     {
         return $this->hasMany(WaterQuality::class, 'sowing_id');
     }
+    public function assignedUsers()
+{
+    return $this->belongsToMany(User::class, 'assigned_sowings');
+}
+
 }

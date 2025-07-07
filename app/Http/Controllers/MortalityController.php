@@ -13,49 +13,56 @@ use Carbon\Carbon;
 
 class MortalityController extends Controller
 {
-    public function create()
-    {
-        $pondCodeId = request()->pond_code_id;
+   public function create()
+{
+    $pondCodeId = request()->pond_code_id;
 
-        if ($pondCodeId) {
-            $sowing = Sowing::with(['dietMonitorings' => function ($query) {
-                $query->orderBy('sampling_date');
-            }])
-                ->where('identifier_id', $pondCodeId)
-                ->where('state', 'inicializada')
-                ->first();
+    if ($pondCodeId) {
+        $user = Auth::user();
 
-            if (!$sowing) {
-                return redirect()->back()->with('error', 'No hay una siembra inicializada para este estanque.');
-            }
+        $sowingQuery = Sowing::with(['dietMonitorings' => function ($query) {
+            $query->orderBy('sampling_date');
+        }])
+        ->where('identifier_id', $pondCodeId)
+        ->where('state', 'inicializada');
 
-            $monitorings = $sowing->dietMonitorings;
-            $seguimientosTotal = $monitorings->count();
-
-            if ($seguimientosTotal == 0) {
-                return redirect()->back()->with('error', 'Debe registrar al menos un seguimiento antes de registrar mortalidad.');
-            }
-
-            // Obtener la fecha del primer seguimiento
-            $firstMonitoringDate = $monitorings->first()->sampling_date;
-
-            // Contar registros de mortalidad desde la fecha del primer seguimiento, filtrando por sowing_id
-            $mortalityCountFromFirst = Mortality::where('pond_code_id', $pondCodeId)
-                ->where('sowing_id', $sowing->id)
-                ->where('created_at', '>=', $firstMonitoringDate)
-                ->count();
-
-            // Límite permitido según cantidad de seguimientos
-            $limitePermitido = $seguimientosTotal * 15;
-
-            if ($mortalityCountFromFirst >= $limitePermitido) {
-                return redirect()->back()->with('error', 'Debe realizar el seguimiento número ' . ($seguimientosTotal + 1) . ' para habilitar nuevos registros de mortalidad.');
-            }
+        if ($user->role === 'pasante') {
+            $sowingQuery->whereHas('assignedUsers', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            });
         }
 
-        $lakes = \App\Models\GeoPond::all();
-        return view('auth.admin.Unit_registration.Mortality.form', compact('lakes'));
+        $sowing = $sowingQuery->first();
+
+        if (!$sowing) {
+            return redirect()->back()->with('error', 'No tienes asignada esta cosecha ');
+        }
+
+        $monitorings = $sowing->dietMonitorings;
+        $seguimientosTotal = $monitorings->count();
+
+        if ($seguimientosTotal == 0) {
+            return redirect()->back()->with('error', 'Debe registrar al menos un seguimiento antes de registrar mortalidad.');
+        }
+
+        $firstMonitoringDate = $monitorings->first()->sampling_date;
+
+        $mortalityCountFromFirst = Mortality::where('pond_code_id', $pondCodeId)
+            ->where('sowing_id', $sowing->id)
+            ->where('created_at', '>=', $firstMonitoringDate)
+            ->count();
+
+        $limitePermitido = $seguimientosTotal * 15;
+
+        if ($mortalityCountFromFirst >= $limitePermitido) {
+            return redirect()->back()->with('error', 'Debe realizar el seguimiento número ' . ($seguimientosTotal + 1) . ' para habilitar nuevos registros de mortalidad.');
+        }
     }
+
+    $lakes = \App\Models\GeoPond::all();
+    return view('auth.admin.Unit_registration.Mortality.form', compact('lakes'));
+}
+
 
     public function store(Request $request)
     {

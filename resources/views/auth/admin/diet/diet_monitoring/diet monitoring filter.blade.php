@@ -2,6 +2,25 @@
 
 @section('content')
 
+@php
+    // Definición temporal en caso de que el helper no esté cargado
+    if (!function_exists('formatNumberCol')) {
+        function formatNumberCol($number) {
+            if ($number === null) return '-';
+
+            if (floor($number) == $number) {
+                return number_format($number, 0, ',', '.');
+            }
+
+            if (round($number, 1) == $number) {
+                return number_format($number, 1, ',', '.');
+            }
+
+            return number_format($number, 2, ',', '.');
+        }
+    }
+@endphp
+
 <div class="container mt-4">
     <div class="card border-light shadow-sm">
         <div class="card-header bg-light-teal border-0 py-3 d-flex justify-content-between align-items-center">

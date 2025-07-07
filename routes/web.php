@@ -22,6 +22,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\WaterQualityController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AssignedSowingController;
 use App\Http\Controllers\GraficController;
 use App\Models\Tool;
 use Illuminate\Support\Facades\Log;
@@ -206,6 +207,13 @@ Route::middleware(['auth', 'role:admin,pasante'])->group(function () {
 
     Route::get('/grafic', [GraficController::class, 'index'])->name('sowing.dashboard');
     Route::get('/grafic/compare', [GraficController::class, 'compare'])->name('sowing.compare');
+
+    Route::get('/asignaciones', [AssignedSowingController::class, 'index'])->name('assigned_sowings.index');
+    Route::get('/asignaciones/crear', [AssignedSowingController::class, 'create'])->name('assigned_sowings.create');
+    Route::post('/asignaciones', [AssignedSowingController::class, 'store'])->name('assigned_sowings.store');
+    Route::delete('/asignaciones/{id}', [AssignedSowingController::class, 'destroy'])->name('assigned_sowings.destroy');
+
+
 });
 
 /*

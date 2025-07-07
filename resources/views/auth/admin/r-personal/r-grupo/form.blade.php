@@ -46,7 +46,7 @@
                                         </div>
                                         <select name="grupo_id" id="grupo_id"
                                             class="form-control @error('grupo_id') is-invalid @enderror" required>
-                                            <option value="">Seleccione un grupo</option>
+                                            <option value="">Seleccione un Tecnologo</option>
                                             @foreach ($grupos as $grupo)
                                                 <option value="{{ $grupo->id }}">{{ $grupo->nombre }}</option>
                                             @endforeach
