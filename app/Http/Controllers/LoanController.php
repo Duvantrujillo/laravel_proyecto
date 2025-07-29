@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Loan;
 use App\Models\Tool;
+use Carbon\Carbon;
 
 class LoanController extends Controller
 {
@@ -42,7 +43,7 @@ class LoanController extends Controller
             'loan_date' => $request->loan_date,
             'requester_name' => $request->requester_name,
             'requester_id' => $request->requester_id,
-            'delivered_by' => auth()->user()->name,
+            'delivered_by' => auth()->id(),
             'loan_status' => $request->loan_status,
         ]);
 

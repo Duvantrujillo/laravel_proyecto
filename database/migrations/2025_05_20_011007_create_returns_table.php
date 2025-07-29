@@ -16,10 +16,11 @@ class CreateReturnsTable extends Migration
         Schema::create('returns', function (Blueprint $table) {
             $table->id();
             $table->foreignId('loan_id')->constrained()->onDelete('cascade'); // préstamo al que pertenece
-            $table->date('return_date');
+            $table->dateTime('return_date');
             $table->integer('quantity_returned');
             $table->text('return_status')->nullable(); // estado en que se devuelve
-            $table->string('received_by'); // se llena automáticamente con el usuario logueado
+            $table->text('imge_path')->nullable();
+             $table->foreignId('received_by')->constrained('users')->onDelete('cascade'); // se llena automáticamente con el usuario logueado
             $table->timestamps();
         });
     }

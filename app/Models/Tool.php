@@ -11,7 +11,7 @@ class Tool extends Model
 
     protected $table = 'tools';
 
-    protected $fillable = ['amount', 'product', 'observation'];
+    protected $fillable = ['amount','total_quantity', 'product', 'observation', 'image_path', 'extra_info','status'];
 
     public function loans()
     {

@@ -121,7 +121,8 @@
 
         <div class="elegant-form-group">
             <label class="elegant-label">Responsable</label>
-            <input type="email" name="responsible" value="{{ auth()->user()->email }}" class="elegant-input" readonly>
+            <input type="text" name="responsible" value="{{ auth()->user()->name }} {{ auth()->user()->last_name }}" class="elegant-input" readonly>
+
         </div>
 
         <div class="elegant-submit">

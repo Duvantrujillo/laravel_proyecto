@@ -31,5 +31,9 @@ public function returns()
 {
     return $this->hasMany(ReturnModel::class);
 }
+ public function deliveredBy()
+    {
+        return $this->belongsTo(User::class, 'delivered_by');
+    }
 
 }

@@ -350,7 +350,8 @@
                         aria-expanded="false">
                         <i class="fas fa-user-circle mr-1"></i>
                         @if (Auth::check())
-                            <span>{{ Auth::user()->name }}</span>
+                            <span>{{ Auth::user()->name ?? '' }} {{ Auth::user()->last_name ?? '' }}</span>
+
                         @else
                             <script>
                                 Swal.fire({
@@ -565,12 +566,6 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route('mortality.index') }}" class="nav-link">
-                                        <i class="nav-icon fas fa-skull-crossbones"></i>
-                                        <p>Mortalidad</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
                                     <a href="{{ route('species.index') }}" class="nav-link">
                                         <i class="nav-icon fas fa-fish"></i>
                                         <p>Especies de Peces</p>
@@ -597,7 +592,12 @@
                                         </li>
                                     @endif
                                 @endauth
-
+                                <li class="nav-item">
+                                    <a href="{{ route('mortality.index') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-skull-crossbones"></i>
+                                        <p>Mortalidad</p>
+                                    </a>
+                                </li>
                                 <li class="nav-item">
                                     <a href="{{ route('diet_monitoring.create') }}" class="nav-link">
                                         <i class="nav-icon fas fa-clipboard-list"></i>

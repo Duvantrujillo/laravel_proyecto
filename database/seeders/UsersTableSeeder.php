@@ -17,12 +17,12 @@ class UsersTableSeeder extends Seeder
     {
         DB::table('users')->insert([
             [
-                'name' => 'Admin',
-                'last_name' => 'User',
-                'document' => '12345678',
+                'name' => 'Monica',
+                'last_name' => 'Triana',
+                'document' => '1079174059',
                 'state' => 'activo',
-                'phone' => '1234567890',
-                'email' => 'admin@example.com',
+                'phone' => '3228662534',
+                'email' => 'monica.triana059@senaacuicultura.com',
                 'email_verified_at' => now(),
                 'password' => Hash::make('password'), // Encripta la contraseña
                 'role' => 'admin',

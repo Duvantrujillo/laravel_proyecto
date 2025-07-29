@@ -54,7 +54,7 @@
                     <div class="input-group">
                         <span class="input-group-text bg-light"><i class="bi bi-tools"></i></span>
                         <select name="tool_id" id="tool_id" class="form-select rounded-end" required>
-                            <option value="">-- Selecciona una herramienta --</option>
+                            <option value="-1" selected="" disabled="">Seleccione...</option>
                             @foreach ($items as $item)
                                 @if ($item->amount > 0)
                                     <option value="{{ $item->id }}" {{ old('tool_id') == $item->id ? 'selected' : '' }}>
@@ -87,7 +87,7 @@
                     <label for="loan_date" class="form-label fw-bold">Fecha de Préstamo</label>
                     <div class="input-group">
                         <span class="input-group-text bg-light"><i class="bi bi-calendar3"></i></span>
-                        <input type="date" name="loan_date" id="loan_date" class="form-control rounded-end" required
+                        <input type="datetime-local" name="loan_date" id="loan_date" class="form-control rounded-end" required
                                value="{{ old('loan_date', now()->format('Y-m-d')) }}">
                     </div>
                     @error('loan_date')
@@ -148,4 +148,15 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </div>
+<style>
+    select {
+  width: 90%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+</style>
 @endsection

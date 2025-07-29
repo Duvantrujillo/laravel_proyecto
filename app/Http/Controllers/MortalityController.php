@@ -153,30 +153,64 @@ class MortalityController extends Controller
         return response()->json($ponds);
     }
 
-    public function index()
-    {
-        $sowing = \App\Models\Sowing::where('state', 'inicializada')->first();
+public function index()
+{
+    $user = Auth::user();
+    $now = Carbon::now('UTC');
+
+    if ($user->role === 'pasante') {
+        // Obtener IDs de las siembras asignadas al usuario
+       $sowingIds = $user->sowings()->where('state', 'inicializada')->pluck('sowing.id');
+
+        // Si no tiene ninguna siembra, que no vea nada
+        if ($sowingIds->isEmpty()) {
+            return view('auth.admin.Unit_registration.Mortality.Filtro', [
+                'filtro' => collect(),
+                'expected' => 0,
+                'actual' => 0,
+                'now' => $now,
+            ]);
+        }
+
+        // Obtener los IDs de los códigos de estanque relacionados a esas siembras
+        $pondCodeIds = Sowing::whereIn('id', $sowingIds)->pluck('identifier_id');
+
+        // Obtener mortalidades asociadas
+        $filtro = Mortality::with(['user', 'pondUnitCode.pond'])
+            ->whereIn('sowing_id', $sowingIds)
+            ->whereIn('pond_code_id', $pondCodeIds)
+            ->get();
+
+        $actual = Mortality::whereIn('sowing_id', $sowingIds)
+            ->whereIn('pond_code_id', $pondCodeIds)
+            ->sum('amount');
+
+        $expected = Sowing::whereIn('id', $sowingIds)->sum('fish_count');
+
+    } else {
+        // Administrador u otros roles
+        $sowing = Sowing::where('state', 'inicializada')->first();
         $expected = $sowing ? $sowing->fish_count : 0;
         $actual = 0;
 
         if ($sowing) {
             $pondCodeIds = \App\Models\pond_unit_code::where('id', $sowing->identifier_id)->pluck('id');
 
-            $filtro = \App\Models\Mortality::with(['user', 'pondUnitCode.pond'])
+            $filtro = Mortality::with(['user', 'pondUnitCode.pond'])
                 ->where('sowing_id', $sowing->id)
                 ->whereIn('pond_code_id', $pondCodeIds)
                 ->get();
 
-            $actual = \App\Models\Mortality::whereIn('pond_code_id', $pondCodeIds)
+            $actual = Mortality::whereIn('pond_code_id', $pondCodeIds)
                 ->where('sowing_id', $sowing->id)
                 ->sum('amount');
         } else {
             $filtro = collect();
         }
-
-        $now = \Carbon\Carbon::now('UTC'); // Tiempo real del servidor
-        return view('auth.admin.Unit_registration.Mortality.Filtro', compact('filtro', 'expected', 'actual', 'now'));
     }
+
+    return view('auth.admin.Unit_registration.Mortality.Filtro', compact('filtro', 'expected', 'actual', 'now'));
+}
 
 
     public function getSowingData(Request $request)
@@ -204,14 +238,18 @@ class MortalityController extends Controller
             'fish_balance' => $fishBalance
         ]);
     }
-    public function history($sowingId)
-    {
-        $filtro = \App\Models\Mortality::where('sowing_id', $sowingId)
-            ->orderBy('datetime', 'desc')
-            ->get();
+public function history($sowingId)
+{
+    $filtro = \App\Models\Mortality::where('sowing_id', $sowingId)
+        ->orderBy('datetime', 'desc')
+        ->get();
 
-        return view('auth.admin.Unit_registration.Mortality.Filtro', compact('filtro'));
-    }
+    $now = \Carbon\Carbon::now('UTC');
+    $expected = \App\Models\Sowing::find($sowingId)?->fish_count ?? 0;
+    $actual = \App\Models\Mortality::where('sowing_id', $sowingId)->sum('amount');
+
+    return view('auth.admin.Unit_registration.Mortality.Filtro', compact('filtro', 'expected', 'actual', 'now'));
+}
 
 
 

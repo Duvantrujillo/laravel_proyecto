@@ -47,9 +47,9 @@
                                 <th class="text-end">Balance</th>
                                 <th class="text-end">% Biom.</th>
                                 <th class="text-end">Biomasa</th>
-                                <th class="text-end">Alimento</th>
+                                <th class="text-end">Alimento (g)</th>
                                 <th class="text-end">Raciones</th>
-                                <th class="text-end">Ración</th>
+                                <th class="text-end">Ración (g)</th>
                                 <th class="text-end">Ganancia</th>
                                 <th class="text-end">Mortalidad</th>
                                 <th class="text-end pe-4">Alimento</th>

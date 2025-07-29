@@ -125,7 +125,26 @@
                                                     <td>{{ $mortalidad->datetime }}</td>
                                                     <td>{{ $mortalidad->amount }}</td>
                                                     <td>{{ $mortalidad->fish_balance }}</td>
-                                                    <td class="text-truncate" style="max-width: 200px;">{{ $mortalidad->observation }}</td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#observacionModal{{ $mortalidad->id }}">
+                                                            <i class="fas fa-book"></i>
+                                                        </button>
+
+                                                        <!-- Modal -->
+                                                        <div class="modal fade" id="observacionModal{{ $mortalidad->id }}" tabindex="-1" aria-labelledby="observacionLabel{{ $mortalidad->id }}" aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="observacionLabel{{ $mortalidad->id }}">Observación completa</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                                    </div>
+                                                                    <div class="modal-body text-start">
+                                                                        {{ $mortalidad->observation ?? 'Sin observación registrada.' }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
                                                     <td>
                                                         {{ $mortalidad->pondUnitCode->pond->name ?? 'Sin nombre' }} -
                                                         {{ $mortalidad->pondUnitCode->identificador ?? 'Sin identificador' }}
@@ -171,6 +190,7 @@
 @endsection
 
 @section('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
     .table th,
     .table td {
@@ -182,9 +202,7 @@
 @endsection
 
 @section('scripts')
-<!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
     function confirmarDobleEliminacion(id) {
         Swal.fire({

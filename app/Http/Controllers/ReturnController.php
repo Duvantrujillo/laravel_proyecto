@@ -57,92 +57,68 @@ class ReturnController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'loan_id' => 'required|exists:loans,id',
-            'returned_quantity' => 'required|integer|min:1',
-            'return_date' => 'required|date',
-            'return_status' => 'nullable|string|max:1000',
-        ]);
+public function store(Request $request)
+{
+    // Validamos sin la regla 'after_or_equal:now' para controlar manualmente
+    $request->validate([
+        'loan_id' => 'required|exists:loans,id',
+        'returned_quantity' => 'required|integer|min:1',
+        'return_date' => 'required|date',
+        'return_status' => 'nullable|string|max:1000',
+        'img' => 'nullable|image|max:2048'
+    ]);
 
-        $loan = Loan::find($request->loan_id);
-        $pending = $loan->quantity - $loan->returned_quantity;
+    // Parseamos la fecha recibida y la fecha actual del servidor
+    $returnDate = Carbon::parse($request->return_date);
+    $now = now();
 
-        if ($request->returned_quantity > $pending) {
-            return back()->withErrors(['returned_quantity' => 'La cantidad devuelta excede la cantidad pendiente.']);
+    // Permitir hasta 5 minutos atrás para evitar errores por diferencia horaria o segundos
+    if ($returnDate->lt($now->subMinutes(5))) {
+        return back()->withErrors(['return_date' => 'La fecha de devolución no puede ser menor a 5 minutos atrás respecto a la hora actual.']);
+    }
+
+    $loan = Loan::find($request->loan_id);
+    $pending = $loan->quantity - $loan->returned_quantity;
+
+    if ($request->returned_quantity > $pending) {
+        return back()->withErrors(['returned_quantity' => 'La cantidad devuelta excede la cantidad pendiente.']);
+    }
+
+    $imge_path = null;
+    if ($request->hasFile('img') && $request->file('img')->isValid()) {
+        $imge_path = $request->file('img')->store('Tool_return', 'public');
+    }
+
+    ReturnModel::create([
+        'loan_id' => $loan->id,
+        'quantity_returned' => $request->returned_quantity,
+        'return_date' => $returnDate,
+        'return_status' => $request->return_status ?? 'Devuelto',
+        'imge_path' => $imge_path,
+        'received_by' => auth()->id(),
+    ]);
+
+    $loan->returned_quantity += $request->returned_quantity;
+
+    if ($loan->quantity == $loan->returned_quantity) {
+        if (!str_contains($loan->loan_status, 'Completado')) {
+            $loan->loan_status .= ' - Completado';
         }
-
-        // Crear registro de devolución
-        ReturnModel::create([
-            'loan_id' => $loan->id,
-            'quantity_returned' => $request->returned_quantity,
-            'return_date' => $request->return_date,
-            'return_status' => $request->return_status ?? 'Devuelto',
-            'received_by' => auth()->user()->name,
-        ]);
-
-        // Actualizar cantidad devuelta en el préstamo
-        $loan->returned_quantity += $request->returned_quantity;
-        
-        // Actualizar estado si se completó la devolución
-        if ($loan->quantity == $loan->returned_quantity) {
-            $loan->loan_status = 'Completado';
-        }
-        
-        $loan->save();
-
-        // Actualizar inventario de herramientas
-        $item = Tool::find($loan->tool_id);
-        $item->amount += $request->returned_quantity;
-        $item->save();
-
-        return redirect()->route('returns.create')
-               ->with('success', 'Devolución registrada exitosamente.');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+    $loan->save();
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+    $item = Tool::find($loan->tool_id);
+    $item->amount += $request->returned_quantity;
+    $item->save();
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+    return redirect()->route('returns.create')
+           ->with('success', 'Devolución registrada exitosamente.');
+}
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+    // Métodos show, edit, update, destroy quedan igual...
+    public function show($id) { }
+    public function edit($id) { }
+    public function update(Request $request, $id) { }
+    public function destroy($id) { }
 }

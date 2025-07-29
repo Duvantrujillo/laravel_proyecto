@@ -16,8 +16,12 @@ class CreateToolsTable extends Migration
         Schema::create('tools', function (Blueprint $table) {
             $table->id();
             $table->integer('amount');
+            $table->integer('total_quantity');
             $table->string('product');
             $table->text('observation');
+            $table->string('image_path')->nullable();
+            $table->text('extra_info')->nullable();
+            $table->enum('status', ['enabled', 'disabled'])->default('enabled'); // status with limited options
             $table->timestamps();
         });
     }

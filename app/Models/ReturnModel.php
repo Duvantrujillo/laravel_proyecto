@@ -17,10 +17,20 @@ class ReturnModel extends Model
         'return_date',
         'return_status',
         'received_by',
+        'imge_path',
     ];
 
     public function loan()
     {
         return $this->belongsTo(Loan::class);
     }
+    public function receivedBy()
+{
+    return $this->belongsTo(User::class, 'received_by');
+}
+public function hasImage()
+{
+    return !empty($this->imge_path);
+}
+
 }

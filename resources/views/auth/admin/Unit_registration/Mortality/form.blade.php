@@ -49,7 +49,7 @@
 
         <div class="form-group mt-3">
             <label for="observation">Observaciones:</label>
-            <textarea name="observation" class="form-control">{{ old('observation') }}</textarea>
+            <textarea name="observation" class="form-control" required>{{ old('observation') }}</textarea>
         </div>
 
         <button type="submit" class="btn btn-primary mt-3" id="submit-btn">Guardar</button>
