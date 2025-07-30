@@ -648,12 +648,7 @@
         </div>
 
         <!-- Footer -->
-        <footer class="main-footer animate__animated animate__fadeInUp">
-            <strong>© {{ date('Y') }} Panel de Administración</strong> - Todos los derechos reservados
-            <div class="float-right d-none d-sm-inline-block">
-                <small>Versión 1.0.0</small>
-            </div>
-        </footer>
+
     </div>
 
     <!-- jQuery -->

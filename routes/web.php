@@ -175,6 +175,7 @@ Route::middleware(['auth', 'role:admin,pasante'])->group(function () {
     // Préstamos y devoluciones
     Route::resource('loans', LoanController::class);
     Route::resource('returns', ReturnController::class);
+    Route::get('/check-requester/{cedula}', [LoanController::class, 'checkRequester'])->name('check.requester');
 
     // Visitantes
     Route::resource('visitors', VisitorController::class)->only(['index', 'create', 'store']);

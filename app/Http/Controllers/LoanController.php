@@ -53,6 +53,18 @@ class LoanController extends Controller
         return redirect()->route('loans.create')->with('success', 'Herramienta prestada correctamente.');
     }
 
+    public function checkRequester($cedula)
+{
+    $loan = Loan::where('requester_id', $cedula)->first();
+
+    if ($loan) {
+        return response()->json(['exists' => true, 'name' => $loan->requester_name]);
+    }
+
+    return response()->json(['exists' => false]);
+}
+
+
     public function show($id)
     {
         //

@@ -367,9 +367,10 @@
                                 aria-label="Cerrar"></button>
                         </div>
 
-                        <div class="modal-body text-center">
-                            <img id="modalImage" src="" alt="Imagen devolución" class="img-fluid" />
-                        </div>
+                      <div class="modal-body text-center">
+    <img id="modalImage" src="" alt="Imagen devolución" class="img-fluid d-block mx-auto rounded" style="width: 200px;" />
+</div>
+
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
